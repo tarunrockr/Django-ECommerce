@@ -1,0 +1,5 @@
+#loading{
+	text-align: center;
+	background: url("/static/front/images/loader.gif") no-repeat center;
+	height: 150px;
+}
