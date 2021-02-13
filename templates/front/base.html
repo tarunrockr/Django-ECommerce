@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Header  -->
+		{% include 'front/partials/header.html' %}
+	</head>
+	<body>
+
+		<!-- Navbar  -->
+		{% include 'front/partials/navbar.html' %}
+
+		<!-- Main Content  -->
+		{% block content %}
+		{% endblock %}
+
+		{# block for individual page js #}
+		{% block js_block %}
+		{% endblock %}
+		
+	</body>
+</html>
