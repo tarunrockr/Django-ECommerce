@@ -44,6 +44,8 @@ def products(request):
 def fetch_products_ajax(request):
 
 	cursor = connection.cursor()
+
+	last_id = request.POST.get('last_id')
 	
 	brand   = request.POST.getlist('brand[]')
 	ram     = request.POST.getlist('ram[]')
@@ -63,37 +65,57 @@ def fetch_products_ajax(request):
 		storage_string = ",".join("'" + item + "'" for item in storage)
 		sql += " AND storage IN("+storage_string+")"
 
+	if last_id == "":
+		sql += " LIMIT 2"
+	else:
+		sql += " AND id > '"+str(last_id)+"' LIMIT 3 "
+
 	cursor.execute(sql)
 	products = cursor.fetchall()
 
 	output=''
+	last_product_id = 0
+	fetched_product_count = 0
 	if products:
 		for product in products:
 
+			fetched_product_count += 1
+
+			output+="<div class='row'>"
 			output+="<div class='col-lg-4 col-md-6 col-sm-10 offset-md-0 offset-sm-1'>"
-			output+="<div class='card'> <img class='card-img-top' src='{0}'>".format( os.path.join(settings.MEDIA_URL, product[4]) )
-			output+="<div class='card-body'>"
+			output+="	<div class='card'> <img class='card-img-top' src='{0}'>".format( os.path.join(settings.MEDIA_URL, product[4]) )
+			output+="		<div class='card-body'>"
 
-			output+="<h5><b>{0}</b> </h5>".format(product[1])
-			output+="<div class='d-flex flex-row my-2'>"
-			output+="<div class='text-muted'>Price: {0}₹<br>Brand: {1}<br>Ram: {2} GB<br>Storage: {3} GB<br></div>".format(product[2],product[9].title(),product[12],product[13])
+			output+="		<h5><b>{0}</b> </h5>".format(product[1])
+			output+="		<div class='d-flex flex-row my-2'>"
+			output+="		<div class='text-muted'>Price: {0}₹<br>Brand: {1}<br>Ram: {2} GB<br>Storage: {3} GB<br></div>".format(product[2],product[9].title(),product[12],product[13])
 			
-			output+="<div class='ml-auto'>"
-			output+="<button class='border rounded bg-white sign'><span class='fa fa-minus' id='orange'></span></button>"
-			output+="<span class='px-sm-1'>1 item</span>"
-			output+="<button class='border rounded bg-white sign'><span class='fa fa-plus' id='orange'></span></button>"
+			output+="		<div class='ml-auto'>"
+			output+="			<button class='border rounded bg-white sign'><span class='fa fa-minus' id='orange'></span></button>"
+			output+="				<span class='px-sm-1'>1 item</span>"
+			output+="			<button class='border rounded bg-white sign'><span class='fa fa-plus' id='orange'></span></button>"
+			output+="		</div>"
+
+			output+="		</div>"
+			output+="		<button class='btn w-100 rounded my-2'>Add to cart</button>"
+
+			output+="		</div>"
+			output+="		</div>"
+			output+="	</div>"
+			output+="</div>"
 			output+="</div>"
 
-			output+="</div>"
-			output+="<button class='btn w-100 rounded my-2'>Add to cart</button>"
+			last_product_id = product[0]
 
-			output+="</div>"
-			output+="</div>"
-			output+="</div>"
-			output+="</div>"
+
+		output+="<div class='col-lg-12' id='remove_row'>"
+		output+="	<a href='javascript:void();' class='load_more btn btn-primary form-control' last_id='{0}' >Load More</a>".format(last_product_id)
+		output+="</div>"
 	else:
-		output += "<div class ='alert alert-warning text-center' style='width: 100%;margin-top: 10%;' ><span style='font-size:25px;'><strong>No result found.</strong></span></div>"
-
+		if fetched_product_count == 0  and last_id !="":
+			output += ""
+		else:
+			output += "<div class ='alert alert-warning text-center' style='width: 100%;margin-top: 10%;' ><span style='font-size:25px;'><strong>No result found.</strong></span></div>"
 
 	data = [{'data':output}]
 	return JsonResponse(data, safe=False)

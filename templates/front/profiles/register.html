@@ -1,0 +1,75 @@
+{% extends 'front/base.html' %}
+
+{% load static %}
+
+{% block css_block %}
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<form action="/action_page.php" style="border:1px solid #ccc">
+				  <div class="container">
+
+				  	<div class="header_cls">
+					    <h2 class="header_h1_cls">Sign Up</h2>
+					    <p class="header_p_cls">Please fill in this form to create an account.</p>
+					</div>
+				    <hr>
+
+				    <div class="row">
+
+				    	<div class="col-md-6">
+					    	<label for="first_name" class="leb"><b>First Name</b></label>
+						    <input type="text" placeholder="Enter Name" class="inp" name="first_name" required>
+					    </div>
+
+					    <div class="col-md-6">
+					    	<label for="last_name" class="leb"><b>Last Name</b></label>
+						    <input type="text" placeholder="Enter Email" class="inp" name="last_name" required>
+					    </div>
+
+				    </div>
+
+				    <div class="row">
+
+				    	<div class="col-md-6">
+					    	<label for="mobile" class="leb"><b>Moble</b></label>
+						    <input type="text" placeholder="Enter Mobile" class="inp" name="mobile" required>
+					    </div>
+
+					    <div class="col-md-6">
+					    	<label for="email" class="leb"><b>Email</b></label>
+						    <input type="text" placeholder="Enter Email" class="inp" name="email" required>
+					    </div>
+
+				    </div>
+					    
+				    <div class="row">
+
+				    	<div class="col-md-6">
+						    <label for="psw" class="leb"><b>Password</b></label>
+						    <input type="password" placeholder="Enter Password" class="inp" name="psw" required>
+						 </div>
+
+						 <div class="col-md-6">
+						    <label for="psw" class="leb"><b>Confirm Password</b></label>
+						    <input type="password" placeholder="Enter Password" class="inp" name="psw" required>
+						 </div>
+
+					</div>
+				    
+				    <p>If already registered click here to <a href="#" style="color:dodgerblue">LOGIN</a>.</p>
+
+				    <div class="clearfix">
+				      <button type="submit" class="btn login_btn">Sign Up</button>
+				    </div>
+				  </div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

@@ -258,6 +258,40 @@
 			filter_data();
 		});
 
+		// load more functionality, START
+		$(document).on('click','.load_more', function(event){
+			event.preventDefault();
+			//alert("hello"); return false;
+			load_more_data();
+		});
+
+		function load_more_data(){
+
+			var brand   = get_filter('brand');
+			var ram     = get_filter('ram');
+			var storage = get_filter('storage');
+			var last_id = $('.load_more').attr('last_id');			$.ajax({
+				url: "{% url 'products.fetch.ajax' %}",
+				method: "POST",
+				data: { csrfmiddlewaretoken: "{{ csrf_token }}", 'brand[]': brand, 'ram[]': ram, 'storage[]': storage, last_id: last_id },
+				dataType: 'json',
+				success: function(data){
+					$('#remove_row').remove();
+					if(data[0]['data'] != ""){
+						$('.filter_data').append(data[0]['data']);
+					}
+				},
+				error: function(data){
+
+				},
+				complete: function(data){
+
+				}
+			});
+		}
+		// load more functionality, END 
+
+
 		
 	});
 
