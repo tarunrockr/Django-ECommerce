@@ -4,14 +4,28 @@ from .models import Profile
 from django.contrib.auth.models import User, auth
 from django.urls import reverse
 from django.contrib import messages
+from .forms import LoginForm
+from django.contrib.auth import authenticate, login 
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 # Create your views here.
 
+# def user_not_loggedin(user):
+# 	# Return true is user is logged out
+# 	return not user.is_authenticated
+
+#@user_passes_test(user_not_loggedin, login_url='/user_profile')
 def register_show(request):
-	
+	if request.user.is_authenticated:
+		return HttpResponseRedirect(reverse('profile.dashboard'))
+
 	return render(request, 'front/profiles/register.html', {})
 
+#@user_passes_test(user_not_loggedin, login_url='/user_profile')
 def register_post(request):
+
+	if request.user.is_authenticated:
+		return HttpResponseRedirect(reverse('profile.dashboard'))
 	
 	if request.method == "POST":
 
@@ -62,13 +76,65 @@ def register_post(request):
 		else:
 			messages.error(request, "User already Registerd.")
 			return HttpResponseRedirect(reverse('register.show'))
-		
 
-
+#@user_passes_test(user_not_loggedin, login_url='/user_profile')
 def login_show(request):
-	pass
-	# render(request, '', {})
 
+	if request.user.is_authenticated:
+		return HttpResponseRedirect(reverse('profile.dashboard'))
+
+	form = LoginForm()
+	return render(request, 'front/profiles/login.html', {'form': form})
+
+#@user_passes_test(user_not_loggedin, login_url='/user_profile')
 def login_post(request):
-	pass
-	# render(request, '', {})
+
+	if request.user.is_authenticated:
+		return HttpResponseRedirect(reverse('profile.dashboard'))
+	
+	if request.method == "POST":
+
+		form = LoginForm(request.POST)
+		if form.is_valid():
+
+			email    = form.cleaned_data['email']
+			password = form.cleaned_data['password']
+
+			user = authenticate(request, email=email, password=password)
+
+			if user is not None:
+				login(request, user)
+				# Storing userdata in session
+				request.session['user_id']    = user.id 
+				request.session['email']      = user.email
+				request.session['first_name'] = user.first_name
+				request.session['last_name']  = user.last_name
+				request.session['logged_in']  = True 
+
+				# Redirecting to user profile page
+				return HttpResponseRedirect(reverse('profile.dashboard'))
+			else:
+				messages.error(request, "Email or Password is incorrect.")
+				return render(request, 'front/profiles/login.html', {'form': form})
+
+		else:
+			messages.error(request, "Email or Password is invalid.")
+			return render(request, 'front/profiles/login.html', {'form': form})
+
+	else:
+
+		form = LoginForm()
+		return render(request, 'front/profiles/login.html', {'form': form})
+
+def logout(request):
+
+	auth.logout(request)
+	messages.success(request,"Success: Logout successfully.")
+	return HttpResponseRedirect(reverse('login.show'))
+
+#@login_required(login_url = 'login.show')
+@login_required()
+def  user_profile(request):
+	#return HttpResponse(request.session['email'])
+
+	return render(request, 'front/profiles/profile_dashboard.html',{})

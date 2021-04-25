@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'store.apps.StoreConfig',
     'profiles.apps.ProfilesConfig',
+    'carts.apps.CartsConfig',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'carts.context_processors.context_processors.cart_item_count',
             ],
         },
     },
@@ -88,6 +90,9 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
+        'OPTIONS': {
+                    'sql_mode': 'traditional',
+                }
     }
 }
 
@@ -155,3 +160,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')
 
 
 #AUTH_USER_MODEL = 'profiles.User'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'profiles.authentication.EmailAuthBackend',
+)
+
+# Used to redirect user to login url if not authenticated
+LOGIN_URL = 'login.show'
+# Used after successful login
+LOGIN_REDIRECT_URL = 'profile.dashboard'

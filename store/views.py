@@ -97,7 +97,7 @@ def fetch_products_ajax(request):
 			output+="		</div>"
 
 			output+="		</div>"
-			output+="		<button class='btn w-100 rounded my-2'>Add to cart</button>"
+			output+="		<button class='btn w-100 rounded my-2 add_to_cart' product-id='{0}'>Add to cart</button>".format(product[0])
 
 			output+="		</div>"
 			output+="		</div>"

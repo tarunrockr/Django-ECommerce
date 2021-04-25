@@ -222,6 +222,49 @@
 	
 	$(function(){
 
+		// Add to cart
+		$(document).on('click','.add_to_cart',function(){
+
+			var product_id = $(this).attr('product-id');
+			var cart_count = $('#lblCartCount').text();
+			
+			$.ajax({
+				url: "{% url 'cart.update' %}",
+				method: "POST",
+				data: { csrfmiddlewaretoken: "{{ csrf_token }}", 'product_id': product_id },
+				dataType: 'json',
+				success: function(data){
+					//console.log(data[0].message);
+					cart_count = parseInt(cart_count) + 1;
+					$('#lblCartCount').text(cart_count);
+
+					$.alert({
+						boxWidth: '16%',
+						useBootstrap: false,
+
+						animation: 'bottom',
+						closeAnimation: 'top',
+
+						icon: 'fa fa-check-circle',
+					    title: 'Added to cart',
+					    //content: '',
+					    content: false,
+					    type: 'green',
+					    columnClass: 'small',
+					    autoClose: 'ok|100',
+					    buttons: { ok: { isHidden: true,  } }
+					});
+				},
+				error: function(data){
+
+				},
+				complete: function(data){
+
+				}
+			}); 
+			
+		});
+
 		function filter_data(){
 			//$('.filter_data').html('<div id="loading"></div>');
 			var brand   = get_filter('brand');
@@ -270,7 +313,8 @@
 			var brand   = get_filter('brand');
 			var ram     = get_filter('ram');
 			var storage = get_filter('storage');
-			var last_id = $('.load_more').attr('last_id');			$.ajax({
+			var last_id = $('.load_more').attr('last_id');			
+			$.ajax({
 				url: "{% url 'products.fetch.ajax' %}",
 				method: "POST",
 				data: { csrfmiddlewaretoken: "{{ csrf_token }}", 'brand[]': brand, 'ram[]': ram, 'storage[]': storage, last_id: last_id },
@@ -290,8 +334,6 @@
 			});
 		}
 		// load more functionality, END 
-
-
 		
 	});
 
