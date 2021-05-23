@@ -10,17 +10,17 @@ def cart_item_count(request):
 		cart_count = 0
 		try:
 			cart_data     = Cart.objects.get(user_id = user_id)
-		except:
+		except Cart.DoesNotExist:
 			cart_data = None
 		if cart_data is not None:
 			try:
 				cartitem_data = CartItem.objects.filter(cart_id = cart_data.id)
-			except:
+			except CartItem.DoesNotExist:
 				cartitem_data = None
 
-		if cartitem_data is not None:
-			for ele in cartitem_data:
-				cart_count +=  ele.quantity
+			if cartitem_data is not None:
+				for ele in cartitem_data:
+					cart_count +=  ele.quantity
 
 		return {
 			'cart_count': cart_count

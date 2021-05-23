@@ -18,15 +18,14 @@ def show_cart(request):
 
 		try:
 			cart =  Cart.objects.get(user_id = user_id)
-		except cart.DoesNotExist:
+		except Cart.DoesNotExist:
 			cart = None
-
 			
 		if cart is not None:
 
 			try: 
 				cart_items = CartItem.objects.select_related('product').filter(cart_id = cart.id).values('id','quantity','product_total','product_id','product__name','product__price')
-			except cart_items.DoesNotExist:
+			except CartItem.DoesNotExist:
 				cart_items = None
 
 			if cart_items is not None:
@@ -42,7 +41,7 @@ def show_cart(request):
 						total += float(ele['product_total']) 
 						cartdata[ele['product_id']] = {'product_name': ele['product__name'],'product_quantity': ele['quantity'], 'product_price': float(ele['product__price']), 'product_total': float(ele['product_total']) }
 
-				print(cartdata)
+				#print(cartdata)
 				#return HttpResponse(cartdata)
 				context = {'success':True, 'message': '', 'cart': cartdata,'total_item':total_item, 'total':total, 'source': 'database'}
 
@@ -62,17 +61,25 @@ def show_cart(request):
 			cart = request.COOKIES['cart']
 			# using ast.literal_eval() convert dictionary string to dictionary
 			cart = ast.literal_eval(cart)
-			# Total quantity in cart
-			total_item = 0
-			total = 0
-			for key, value in cart.items():
-				total_item += value['product_quantity']
-				total += value['product_total']
+			#print("Cart: ",len(cart))
+			if( len(cart) > 0 ):
+				# Total quantity in cart
+				total_item = 0
+				total = 0
+				for key, value in cart.items():
+					total_item += value['product_quantity']
+					total += value['product_total']
 
-			context = {'success':True, 'message': '', 'cart': cart, 'total_item':total_item, 'total':total, 'source': 'cookie'}
+				context = {'success':True, 'message': '', 'cart': cart, 'total_item':total_item, 'total':total, 'source': 'cookie'}
+			else:
+				context = {'success':False, 'message': 'Your cart is empty.', 'cart': cart,'total_item':0, 'total':0, 'source': 'cookie'}
+
 		else:
 			cart= {}
 			context = {'success':False, 'message': 'Your cart is empty.', 'cart': cart,'total_item':0, 'total':0, 'source': 'cookie'}
+
+	# print(context)
+	# return HttpResponse(context)
 
 	return render(request, 'front/carts/cart.html', context)
 
@@ -205,7 +212,57 @@ def remove_cart_product(request):
 	product_id = request.POST['product_id']
 
 	if request.user.is_authenticated:
-		pass
+		user_id = request.session['user_id']
+
+		# Fetching the cart
+		try:
+			cart = Cart.objects.get(user_id=user_id)
+		except cart.DoesNotExist:
+			cart = None
+
+		if cart is not None:
+			# Fetching the cart
+			try:
+				cartitem = CartItem.objects.filter(cart_id = cart.id)
+			except cartitem.DoesNotExist:
+				# Delete the cart
+				cart.delete()
+				cartitem = None
+
+			if cartitem is not None:
+
+				# Delete the item from cart
+				delitem = CartItem.objects.get(product_id=product_id)
+				delitem.delete()
+
+				new_total=0.00
+				total_item = 0
+				if CartItem.objects.filter(cart_id = cart.id).exists():
+					reload_status = False
+					# Update the cart total amount
+					newitems = CartItem.objects.filter(cart_id=cart.id)
+					
+					for item in newitems:
+						total_item += int(item.quantity)
+						new_total += float(item.product_total)
+
+					cart.total = new_total
+					cart.save()
+
+				else:
+					# Delete the cart
+					cart.delete()
+					reload_status = True
+
+				cartdata = [{'success': True,'error': True, 'message': 'Product removed from cart','total':new_total,'total_item':total_item,'reload': reload_status }]
+
+			else:
+				cartdata = [{'success': False,'error': True, 'message': 'Cart is empty', 'total': 0.00,'total_item': 0, 'reload': True}]
+
+		else:
+			cartdata = [{'success': False,'error': True, 'message': 'Cart is empty', 'total': 0.00,'total_item': 0, 'reload': True }]
+
+		return JsonResponse(cartdata, safe=False)
 
 	else:
 		if 'cart' in request.COOKIES.keys():
@@ -218,16 +275,255 @@ def remove_cart_product(request):
 			cookie_data.pop(int(product_id), None)
 			# del cookie_data[product_id]
 
+			total_item = 0
+			total = 0
 			if len(cookie_data) == 0 :
 				reload = True
 			else:
+				# Total quantity in cart
+				for key, value in cookie_data.items():
+					total_item += value['product_quantity']
+					total += round(value['product_total'],2)
 				reload = False
 
-			data = [{'success': True,'error': False, 'message': 'Product removed from cart', 'reload': reload}]
+			data = [{'success': True,'error': False, 'message': 'Product removed from cart', 'total': total, 'total_item': total_item, 'reload': reload}]
 			response =  JsonResponse(data, safe=False)
 			response.set_cookie('cart', cookie_data)
 			return response
 		else:
-			data = [{'success': False,'error': True, 'message': 'Cart is empty','reload': False}]
+			data = [{'success': False,'error': True, 'message': 'Cart is empty', 'total': 0.00, 'total_item': 0, 'reload': False}]
 			return JsonResponse(data, safe=False)
 
+
+def add_cart_quantity(request):
+
+	product_id = request.POST['product_id']
+
+	if request.user.is_authenticated:
+		
+		user_id = request.session['user_id']
+
+		# Fetching the cart
+		try:
+			cart = Cart.objects.get(user_id=user_id)
+		except Cart.DoesNotExist:
+			cart = None
+
+
+		if cart is not None:
+
+			try:
+				cartitem = CartItem.objects.get(cart_id=cart.id, product_id=product_id)
+			except CartItem.DoesNotExist:
+				cartitem = None
+
+			if cartitem is not None:
+
+				# Fetch product data
+				try:
+					product_data = Product.objects.get(pk = product_id)
+				except Product.DoesNotExist:
+					product_data = None
+
+				if product_data is not None:
+
+					# Updating the cart after increasing the quantity
+					cartitem.quantity = int(cartitem.quantity + 1)
+					cartitem.product_total = float(cartitem.quantity * product_data.price )
+					cartitem.save()
+
+					# Calculate grand total 
+					cartitems = CartItem.objects.filter(cart_id=cart.id)
+					grand_total = 0.00
+
+					for ele in cartitems:
+						grand_total += float(ele.product_total)
+
+					# update cart 
+					cart.total = float(grand_total)
+					cart.save()
+
+					sub_dict = {'product_quantity': cartitem.quantity, 'product_total': cartitem.product_total}
+
+					data=[{'success': True, 'error': False, 'message': 'Quantity Increased successfully!', 'data': sub_dict,'grand_total': grand_total}]
+					return JsonResponse(data, safe=False)
+
+				else:
+
+					data=[{'success': False, 'error': True, 'message': 'Product not exist'}]
+					return JsonResponse(data, safe=False)
+
+			else:
+				data=[{'success': False, 'error': True, 'message': 'Product not found in cart'}]
+				return JsonResponse(data, safe=False)
+
+		else:
+			data=[{'success': False, 'error': True, 'message': 'Cart is empty'}]
+			return JsonResponse(data, safe=False)
+
+
+	else:
+		if 'cart' in request.COOKIES.keys():
+
+			cookie_data = request.COOKIES['cart']
+			# using ast.literal_eval() convert dictionary string to dictionary
+			cookie_data = ast.literal_eval(cookie_data)
+
+			sub_dict = None
+			for key, value in cookie_data.items():
+				if str(key) == str(product_id):
+					sub_dict = value
+
+
+			if sub_dict is not None:
+
+				sub_dict['product_quantity'] += 1
+				product_total = sub_dict['product_price'] * sub_dict['product_quantity']
+				sub_dict['product_total'] = product_total
+				cookie_data[int(product_id)] = sub_dict
+
+				grand_total = 0.00
+				for key, value in cookie_data.items():
+					grand_total += float(value['product_total'])
+
+
+				data=[{'success': True, 'error': False, 'message': 'Quantity Increased successfully!', 'data': sub_dict,'grand_total': grand_total}]
+				response = JsonResponse(data, safe=False)
+				response.set_cookie('cart',cookie_data)
+				return response
+
+			else:
+				data=[{'success': False, 'error': True, 'message': 'Product not found'}]
+				return JsonResponse(data, safe=False)
+			
+
+		else:
+			data=[{'success': False, 'error': True, 'message': 'Cart is empty'}]
+			return JsonResponse(data, safe=False)
+		
+		
+
+def remove_cart_quantity(request):
+	product_id = request.POST['product_id']
+
+	if request.user.is_authenticated:
+			
+		user_id = request.session['user_id']
+
+		# Fetching the cart
+		try:
+			cart = Cart.objects.get(user_id=user_id)
+		except Cart.DoesNotExist:
+			cart = None
+
+
+		if cart is not None:
+
+			try:
+				cartitem = CartItem.objects.get(cart_id=cart.id, product_id=product_id)
+			except CartItem.DoesNotExist:
+				cartitem = None
+
+			if cartitem is not None:
+
+				# Fetch product data
+				try:
+					product_data = Product.objects.get(pk = product_id)
+				except Product.DoesNotExist:
+					product_data = None
+
+				if product_data is not None:
+
+					if cartitem.quantity > 1:
+
+						# Updating the cart after increasing the quantity
+						cartitem.quantity = int(cartitem.quantity - 1)
+						cartitem.product_total = float(cartitem.quantity * product_data.price )
+						cartitem.save()
+
+						# Calculate grand total 
+						cartitems = CartItem.objects.filter(cart_id=cart.id)
+						grand_total = 0.00
+
+						for ele in cartitems:
+							grand_total += float(ele.product_total)
+
+						# update cart 
+						cart.total = float(grand_total)
+						cart.save()
+
+						sub_dict = {'product_quantity': cartitem.quantity, 'product_total': cartitem.product_total}
+
+						data=[{'success': True, 'error': False, 'message': 'Quantity Decreased successfully!', 'data': sub_dict,'grand_total': grand_total}]
+						return JsonResponse(data, safe=False)
+
+					else:
+
+						data=[{'success': True, 'error': False, 'message': 'Mininum 1 quantity required!', 'data': sub_dict,'grand_total': grand_total}]
+						return JsonResponse(data, safe=False)
+				else:
+
+					data=[{'success': False, 'error': True, 'message': 'Product not exist'}]
+					return JsonResponse(data, safe=False)
+
+			else:
+				data=[{'success': False, 'error': True, 'message': 'Product not found in cart'}]
+				return JsonResponse(data, safe=False)
+
+		else:
+			data=[{'success': False, 'error': True, 'message': 'Cart is empty'}]
+			return JsonResponse(data, safe=False)
+
+	else:
+		if 'cart' in request.COOKIES.keys():
+
+			cookie_data = request.COOKIES['cart']
+			# using ast.literal_eval() convert dictionary string to dictionary
+			cookie_data = ast.literal_eval(cookie_data)
+
+			sub_dict = None
+			for key, value in cookie_data.items():
+				if str(key) == str(product_id):
+					sub_dict = value
+
+
+			if sub_dict is not None:
+
+				if sub_dict['product_quantity'] > 1:
+
+					sub_dict['product_quantity'] -= 1
+					product_total = sub_dict['product_price'] * sub_dict['product_quantity']
+					sub_dict['product_total'] = product_total
+					cookie_data[int(product_id)] = sub_dict
+
+					grand_total = 0.00
+					for key, value in cookie_data.items():
+						grand_total += float(value['product_total'])
+
+
+					data=[{'success': True, 'error': False, 'message': 'Quantity Decreased successfully!', 'data': sub_dict,'grand_total': grand_total}]
+					response = JsonResponse(data, safe=False)
+					response.set_cookie('cart',cookie_data)
+					return response
+
+				else:
+
+					data=[{'success': False, 'error': True, 'message': 'Minimum 1 quantity required'}]
+					return JsonResponse(data, safe=False)
+
+			else:
+				data=[{'success': False, 'error': True, 'message': 'Product not found'}]
+				return JsonResponse(data, safe=False)
+			
+
+		else:
+			data=[{'success': False, 'error': True, 'message': 'Cart is empty'}]
+			return JsonResponse(data, safe=False)
+
+
+
+# Checkout page functions 
+
+def checkout(request):
+
+	return render(request,"front/checkout/checkout.html",{})

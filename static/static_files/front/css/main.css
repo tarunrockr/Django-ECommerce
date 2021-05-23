@@ -19,3 +19,10 @@
   -moz-border-radius: 9px;
   border-radius: 9px;
 }
+
+.checkout_header{
+  background-color: orange;
+  padding: 5px;
+  padding-left: 20px;
+  border-radius: 4px;
+}

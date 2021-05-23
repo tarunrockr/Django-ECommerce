@@ -374,11 +374,10 @@
 	        <div class="col-md-9">
 	            <div class="ibox">
 	                <div class="ibox-title">
-	                    <span class="pull-right">{% if success == True %} (<strong>{{ total_item }}</strong>) {% endif %} items</span>
+	                    <span class="pull-right total_item_cls">{% if success == True %} (<strong>{{ total_item }}</strong>) {% else %} (<strong>0</strong>) {% endif %} items</span>
 	                    <h5>Items in your cart</h5>
 	                </div>
 
-	                {{ success }}
 	            <div class="ibox-content">
 	                <div class="container padding-bottom-3x mb-1">
 	                	{# {{ cart }} #}
@@ -416,12 +415,12 @@
 				                                    </td>
 				                                    <td class="text-center">
 				                                        <div class="qty count-input">
-				                                        	<span class="minus bg-danger" title="Decrease Quantity">-</span>
-				                                        	<input type="text" name="product_quantity" style="width: 40%;height: 24px;" value="{{ value.product_quantity }}" readonly="">
-				                                        	<span class="plus bg-success"  title="Add Quantity">+</span>
+				                                        	<span class="minus bg-danger quantity_desc" id="{{ key }}" title="Decrease Quantity">-</span>
+				                                        	<input type="text" name="product_quantity" class="product_quantity_cls" product-id="{{ key }}" style="width: 40%;height: 24px;" value="{{ value.product_quantity }}" readonly="">
+				                                        	<span class="plus bg-success quantity_inc" id="{{ key }}" title="Add Quantity">+</span>
 				                                        </div>
 				                                    </td>
-				                                    <td class="text-center text-lg text-medium">${{ value.product_total|floatformat:2 }}</td>
+				                                    <td class="text-center text-lg text-medium product_total_cls">${{ value.product_total|floatformat:2 }}</td>
 				                                    <td class="text-center text-lg text-medium">$00.00</td>
 				                                    <td class="text-center">
 				                                    	<a class="remove-from-cart remove_cart_item" id="{{ key }}" href="#" data-toggle="tooltip" title="Remove Item from cart" data-original-title="Remove item"><i class="fa fa-trash"></i></a>
@@ -441,7 +440,7 @@
 		                                <button class="btn btn-outline-primary btn-sm" type="submit">Apply Coupon</button>
 		                            </form>
 		                        </div>
-		                        <div class="column text-lg"><b>Total:</b> <span class="text-medium">${{ total|floatformat:2 }}</span></div>
+		                        <div class="column text-lg"><b>Total:</b> <span class="text-medium total_amount1">${{ total|floatformat:2 }}</span></div>
 		                    </div>
 
 	                    {% endif %}
@@ -696,9 +695,11 @@
 	                    </div>
 	                </div> -->
 
+	                <!-- bootdey.com -->
+
 	                <div class="ibox-content">
-	                    <button class="btn btn-primary pull-right"><i class="fa fa fa-shopping-cart"></i> Checkout</button>
-	                    <button class="btn btn-white"><i class="fa fa-arrow-left"></i> Continue shopping</button>
+	                    <button class="btn btn-primary pull-right"><i class="fa fa fa-shopping-cart"></i><a href="{% url 'checkout' %}">Checkout</a> </button>
+	                    <a href="{% url 'products' %}"><button class="btn btn-white"><i class="fa fa-arrow-left"></i> Continue shopping</button></a>
 	                </div>
 	            </div>
 
@@ -714,7 +715,7 @@
 	                    <span>
 	                        Total
 	                    </span>
-	                    <h2 class="font-bold">
+	                    <h2 class="font-bold total_amount2">
 	                        ${{ total|floatformat:2 }}
 	                    </h2>
 
@@ -724,7 +725,7 @@
 	                    </span>
 	                    <div class="m-t-sm">
 	                        <div class="btn-group">
-	                        <a href="#" class="btn btn-primary btn-sm"><i class="fa fa-shopping-cart"></i> Checkout</a>
+	                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-sm"><i class="fa fa-shopping-cart"></i> Checkout</a>
 	                        <a href="#" class="btn btn-white btn-sm"> Cancel</a>
 	                        </div>
 	                    </div>
@@ -783,6 +784,138 @@
 {% block js_block %}
 <script type="text/javascript">
 	$(function(){
+
+		$(document).on('click', '.quantity_inc', function(event){
+			event.preventDefault();
+
+			var _this = this;
+			var product_id = $(this).attr("id");
+			$.ajax({
+				url: '{% url "cart.quantity.add" %}',
+				method: "POST",
+				dataType: "JSON",
+				data: { csrfmiddlewaretoken: "{{ csrf_token }}" , 'product_id':product_id},
+				success: function(data){
+
+					if(data[0].success == true){
+
+						$(_this).closest('div').find('.product_quantity_cls').val(data[0].data.product_quantity);
+						$(_this).closest('tr').find('.product_total_cls').text("$"+(data[0].data.product_total).toFixed(2));
+						$(".total_amount1").text("$"+(data[0].grand_total).toFixed(2));
+						$(".total_amount2").text("$"+(data[0].grand_total).toFixed(2));
+
+						$.alert({
+							boxWidth: '30%',
+							useBootstrap: false,
+
+							animation: 'bottom',
+							closeAnimation: 'top',
+
+							icon: 'fa fa-check-circle',
+						    title: data[0].message,
+						    //content: '',
+						    content: false,
+						    type: 'green',
+						    columnClass: 'small',
+						    autoClose: 'ok|100',
+						    buttons: { ok: { isHidden: true,  } }
+						});
+
+					}else{
+						$.alert({
+							boxWidth: '30%',
+							useBootstrap: false,
+
+							animation: 'bottom',
+							closeAnimation: 'top',
+
+							icon: 'fa fa-check-circle',
+						    title: data[0].message,
+						    //content: '',
+						    content: false,
+						    type: 'red',
+						    columnClass: 'small',
+						    autoClose: 'ok|100',
+						    buttons: { ok: { isHidden: true,  } }
+						});
+					}
+				},
+				error: function(data){
+
+				},
+				complete: function(data){
+
+				}
+			});
+
+
+		});
+
+		$(document).on('click', '.quantity_desc', function(event){
+			event.preventDefault();
+
+			var _this = this;
+			var product_id = $(this).attr("id");
+			$.ajax({
+				url: '{% url "cart.quantity.remove" %}',
+				method: "POST",
+				dataType: "JSON",
+				data: { csrfmiddlewaretoken: "{{ csrf_token }}" , 'product_id':product_id},
+				success: function(data){
+
+					if(data[0].success == true){
+
+						$(_this).closest('div').find('.product_quantity_cls').val(data[0].data.product_quantity);
+						$(_this).closest('tr').find('.product_total_cls').text("$"+(data[0].data.product_total).toFixed(2));
+						$(".total_amount1").text("$"+(data[0].grand_total).toFixed(2));
+						$(".total_amount2").text("$"+(data[0].grand_total).toFixed(2));
+
+						$.alert({
+							boxWidth: '30%',
+							useBootstrap: false,
+
+							animation: 'bottom',
+							closeAnimation: 'top',
+
+							icon: 'fa fa-check-circle',
+						    title: data[0].message,
+						    //content: '',
+						    content: false,
+						    type: 'green',
+						    columnClass: 'small',
+						    autoClose: 'ok|100',
+						    buttons: { ok: { isHidden: true,  } }
+						});
+
+					}else{
+						$.alert({
+							boxWidth: '30%',
+							useBootstrap: false,
+
+							animation: 'bottom',
+							closeAnimation: 'top',
+
+							icon: 'fa fa-check-circle',
+						    title: data[0].message,
+						    //content: '',
+						    content: false,
+						    type: 'red',
+						    columnClass: 'small',
+						    autoClose: 'ok|100',
+						    buttons: { ok: { isHidden: true,  } }
+						});
+					}
+				},
+				error: function(data){
+
+				},
+				complete: function(data){
+
+				}
+			}); 
+
+		});			
+
 		$(document).on('click', '.remove_cart_item', function(event){
 			event.preventDefault();
 			var product_id = $(this).attr('id');
@@ -794,11 +927,13 @@
 				data: { csrfmiddlewaretoken: "{{ csrf_token }}" , 'product_id':product_id},
 				success: function(data){
 					//console.log("#cart_row_"+product_id);
-					
 					if(data[0].success == true){
 						$(".cart_row_"+product_id).remove();
+						$(".total_amount1").text("$"+(data[0].total).toFixed(2));
+						$(".total_amount2").text("$"+(data[0].total).toFixed(2));
+						$(".total_item_cls").html("(<strong>"+data[0].total_item+"</strong>) items");
 						$.alert({
-							boxWidth: '16%',
+							boxWidth: '30%',
 							useBootstrap: false,
 
 							animation: 'bottom',
@@ -815,7 +950,7 @@
 						});
 					}else{
 						$.alert({
-							boxWidth: '16%',
+							boxWidth: '30%',
 							useBootstrap: false,
 
 							animation: 'bottom',

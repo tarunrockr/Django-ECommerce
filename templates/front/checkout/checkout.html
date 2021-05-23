@@ -1,0 +1,675 @@
+{% extends 'front/base.html' %}
+
+{% block css_block %}
+	<style type="text/css">
+		body{
+		    background:#eee;
+		}
+		h3 {
+		    font-size: 16px;
+		}
+		.text-navy {
+		    color: #1ab394;
+		}
+		.cart-product-imitation {
+		  text-align: center;
+		  padding-top: 30px;
+		  height: 80px;
+		  width: 80px;
+		  background-color: #f8f8f9;
+		}
+		.product-imitation.xl {
+		  padding: 120px 0;
+		}
+		.product-desc {
+		  padding: 20px;
+		  position: relative;
+		}
+		.ecommerce .tag-list {
+		  padding: 0;
+		}
+		.ecommerce .fa-star {
+		  color: #d1dade;
+		}
+		.ecommerce .fa-star.active {
+		  color: #f8ac59;
+		}
+		.ecommerce .note-editor {
+		  border: 1px solid #e7eaec;
+		}
+		table.shoping-cart-table {
+		  margin-bottom: 0;
+		}
+		table.shoping-cart-table tr td {
+		  border: none;
+		  text-align: right;
+		}
+		table.shoping-cart-table tr td.desc,
+		table.shoping-cart-table tr td:first-child {
+		  text-align: left;
+		}
+		table.shoping-cart-table tr td:last-child {
+		  width: 80px;
+		}
+		.ibox {
+		  clear: both;
+		  margin-bottom: 25px;
+		  margin-top: 0;
+		  padding: 0;
+		}
+		.ibox.collapsed .ibox-content {
+		  display: none;
+		}
+		.ibox:after,
+		.ibox:before {
+		  display: table;
+		}
+		.ibox-title {
+		  -moz-border-bottom-colors: none;
+		  -moz-border-left-colors: none;
+		  -moz-border-right-colors: none;
+		  -moz-border-top-colors: none;
+		  background-color: #ffffff;
+		  border-color: #e7eaec;
+		  border-image: none;
+		  border-style: solid solid none;
+		  border-width: 3px 0 0;
+		  color: inherit;
+		  margin-bottom: 0;
+		  padding: 14px 15px 7px;
+		  min-height: 48px;
+		}
+		.ibox-content {
+		  background-color: #ffffff;
+		  color: inherit;
+		  padding: 15px 20px 20px 20px;
+		  border-color: #e7eaec;
+		  border-image: none;
+		  border-style: solid solid none;
+		  border-width: 1px 0;
+		}
+		.ibox-footer {
+		  color: inherit;
+		  border-top: 1px solid #e7eaec;
+		  font-size: 90%;
+		  background: #ffffff;
+		  padding: 10px 15px;
+		}
+
+
+		/*   table css  */
+
+		select.form-control:not([size]):not([multiple]) {
+		    height: 44px;
+		}
+		select.form-control {
+		    padding-right: 38px;
+		    background-position: center right 17px;
+		    background-image: url(data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNv…9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K);
+		    background-repeat: no-repeat;
+		    background-size: 9px 9px;
+		}
+		.form-control:not(textarea) {
+		    height: 44px;
+		}
+		.form-control {
+		    padding: 0 18px 3px;
+		    border: 1px solid #dbe2e8;
+		    border-radius: 22px;
+		    background-color: #fff;
+		    color: #606975;
+		    font-family: "Maven Pro",Helvetica,Arial,sans-serif;
+		    font-size: 14px;
+		    -webkit-appearance: none;
+		    -moz-appearance: none;
+		    appearance: none;
+		}
+
+		.shopping-cart,
+		.wishlist-table,
+		.order-table {
+		    margin-bottom: 20px
+		}
+
+		.shopping-cart .table,
+		.wishlist-table .table,
+		.order-table .table {
+		    margin-bottom: 0
+		}
+
+		.shopping-cart .btn,
+		.wishlist-table .btn,
+		.order-table .btn {
+		    margin: 0
+		}
+
+		.shopping-cart>table>thead>tr>th,
+		.shopping-cart>table>thead>tr>td,
+		.shopping-cart>table>tbody>tr>th,
+		.shopping-cart>table>tbody>tr>td,
+		.wishlist-table>table>thead>tr>th,
+		.wishlist-table>table>thead>tr>td,
+		.wishlist-table>table>tbody>tr>th,
+		.wishlist-table>table>tbody>tr>td,
+		.order-table>table>thead>tr>th,
+		.order-table>table>thead>tr>td,
+		.order-table>table>tbody>tr>th,
+		.order-table>table>tbody>tr>td {
+		    vertical-align: middle !important
+		}
+
+		.shopping-cart>table thead th,
+		.wishlist-table>table thead th,
+		.order-table>table thead th {
+		    padding-top: 17px;
+		    padding-bottom: 17px;
+		    border-width: 1px
+		}
+
+		.shopping-cart .remove-from-cart,
+		.wishlist-table .remove-from-cart,
+		.order-table .remove-from-cart {
+		    display: inline-block;
+		    color: #ff5252;
+		    font-size: 18px;
+		    line-height: 1;
+		    text-decoration: none
+		}
+
+		.shopping-cart .count-input,
+		.wishlist-table .count-input,
+		.order-table .count-input {
+		    display: inline-block;
+		    width: 100%;
+		    width: 86px
+		}
+
+		.shopping-cart .product-item,
+		.wishlist-table .product-item,
+		.order-table .product-item {
+		    display: table;
+		    width: 100%;
+		    min-width: 150px;
+		    margin-top: 5px;
+		    margin-bottom: 3px
+		}
+
+		.shopping-cart .product-item .product-thumb,
+		.shopping-cart .product-item .product-info,
+		.wishlist-table .product-item .product-thumb,
+		.wishlist-table .product-item .product-info,
+		.order-table .product-item .product-thumb,
+		.order-table .product-item .product-info {
+		    display: table-cell;
+		    vertical-align: top
+		}
+
+		.shopping-cart .product-item .product-thumb,
+		.wishlist-table .product-item .product-thumb,
+		.order-table .product-item .product-thumb {
+		    width: 130px;
+		    padding-right: 20px
+		}
+
+		.shopping-cart .product-item .product-thumb>img,
+		.wishlist-table .product-item .product-thumb>img,
+		.order-table .product-item .product-thumb>img {
+		    display: block;
+		    width: 100%
+		}
+
+		@media screen and (max-width: 860px) {
+		    .shopping-cart .product-item .product-thumb,
+		    .wishlist-table .product-item .product-thumb,
+		    .order-table .product-item .product-thumb {
+		        display: none
+		    }
+		}
+
+		.shopping-cart .product-item .product-info span,
+		.wishlist-table .product-item .product-info span,
+		.order-table .product-item .product-info span {
+		    display: block;
+		    font-size: 13px
+		}
+
+		.shopping-cart .product-item .product-info span>em,
+		.wishlist-table .product-item .product-info span>em,
+		.order-table .product-item .product-info span>em {
+		    font-weight: 500;
+		    font-style: normal
+		}
+
+		.shopping-cart .product-item .product-title,
+		.wishlist-table .product-item .product-title,
+		.order-table .product-item .product-title {
+		    margin-bottom: 6px;
+		    padding-top: 5px;
+		    font-size: 16px;
+		    font-weight: 500
+		}
+
+		.shopping-cart .product-item .product-title>a,
+		.wishlist-table .product-item .product-title>a,
+		.order-table .product-item .product-title>a {
+		    transition: color .3s;
+		    color: #374250;
+		    line-height: 1.5;
+		    text-decoration: none
+		}
+
+		.shopping-cart .product-item .product-title>a:hover,
+		.wishlist-table .product-item .product-title>a:hover,
+		.order-table .product-item .product-title>a:hover {
+		    color: #0da9ef
+		}
+
+		.shopping-cart .product-item .product-title small,
+		.wishlist-table .product-item .product-title small,
+		.order-table .product-item .product-title small {
+		    display: inline;
+		    margin-left: 6px;
+		    font-weight: 500
+		}
+
+		.wishlist-table .product-item .product-thumb {
+		    display: table-cell !important
+		}
+
+		@media screen and (max-width: 576px) {
+		    .wishlist-table .product-item .product-thumb {
+		        display: none !important
+		    }
+		}
+
+		.shopping-cart-footer {
+		    display: table;
+		    width: 100%;
+		    padding: 10px 0;
+		    border-top: 1px solid #e1e7ec
+		}
+
+		.shopping-cart-footer>.column {
+		    display: table-cell;
+		    padding: 5px 0;
+		    vertical-align: middle
+		}
+
+		.shopping-cart-footer>.column:last-child {
+		    text-align: right
+		}
+
+		.shopping-cart-footer>.column:last-child .btn {
+		    margin-right: 0;
+		    margin-left: 15px
+		}
+
+		@media (max-width: 768px) {
+		    .shopping-cart-footer>.column {
+		        display: block;
+		        width: 100%
+		    }
+		    .shopping-cart-footer>.column:last-child {
+		        text-align: center
+		    }
+		    .shopping-cart-footer>.column .btn {
+		        width: 100%;
+		        margin: 12px 0 !important
+		    }
+		}
+
+		.coupon-form .form-control {
+		    display: inline-block;
+		    width: 100%;
+		    max-width: 235px;
+		    margin-right: 12px;
+		}
+
+		.form-control-sm:not(textarea) {
+		    height: 36px;
+		}
+
+		/*    Plus, Minus Button Clas     */
+
+		.qty .plus {
+	    	cursor: pointer;
+	        display: inline-block;
+	        vertical-align: top;
+	        color: white;
+	        width: 21px;
+	        height: 21px;
+	        font: 30px/1 Arial,sans-serif;
+	        text-align: center;
+	        border-radius: 50%;
+	        line-height: 75%;
+		}
+		.qty .minus {
+		    cursor: pointer;
+		    display: inline-block;
+		    vertical-align: top;
+		    color: white;
+		    width: 21px;
+		    height: 21px;
+		    font: 30px/1 Arial,sans-serif;
+		    text-align: center;
+		    border-radius: 50%;
+		    background-clip: padding-box;
+		    line-height: 60%;
+		}
+
+		.minus:hover{
+		    background-color: #717fe0 !important;
+		}
+		.plus:hover{
+		    background-color: #717fe0 !important;
+		}
+
+
+		
+	</style>
+{% endblock css_block %}
+
+{% block content %}
+	<div class="container">
+	<div class="wrapper wrapper-content animated fadeInRight">
+	    <div class="row">
+	        <div class="col-md-9">
+	            <div class="ibox">
+	                <div class="ibox-title">
+	                    <span class="pull-right total_item_cls"></span>
+	                    <h5 class="checkout_header">Checkout</h5>
+	                </div>
+
+		            <!-- <div class="ibox-content">
+		                <div class="container padding-bottom-3x mb-1">
+
+
+
+		                    <div class="shopping-cart-footer">
+		                        <div class="column">
+		                            <form class="coupon-form" method="post">
+		                                <input class="form-control form-control-sm" type="text" placeholder="Coupon code" required="">
+		                                <button class="btn btn-outline-primary btn-sm" type="submit">Apply Coupon</button>
+		                            </form>
+		                        </div>
+		                        <div class="column text-lg"><b>Total:</b> <span class="text-medium total_amount1">$7868768</span></div>
+		                    </div>
+
+
+		                </div>
+		            </div> -->
+
+	              	<div class="ibox-content">
+	              	     <div class="table-responsive">
+	              	         <table class="table shoping-cart-table">
+	              	             <tbody>
+	              	             <tr>
+	              	               
+	              	                 <td class="desc">
+	              	                    
+	              	                    <h3 class="text-navy"> Shipping Address </h3>
+	              	                     
+
+	              	                    <div class="container">
+
+	              	                    	<div class="row small">
+	              	                    		<div class="col-md-6">
+	              	                    			<label><b>Name: </b></label>
+	              	                    			<span>ghjhgj</span>
+	              	                    			<input type="hidden" name="name" readonly="" value="mjg">
+	              	                    			<!-- <div class="row">
+	              	                    				<div class="col-md-4">First Name</div>
+	              	                    				<div class="col-md-8">
+	              	                    					<input type="text" name="first_name" readonly="" value="mjg">
+	              	                    				</div>
+	              	                    			</div> -->
+	              	                    		
+	              	                    		</div>
+	              	                    		<div class="col-md-6">
+	              	                    			<label><b>Email: </b></label>
+	              	                    			<span>ghjhgj</span>
+	              	                    			<input type="hidden" name="email" readonly="" value="mjg">
+	              	                    		</div>
+	              	                    	</div>
+
+	              	                    	<div class="row small">
+	              	                    		<div class="col-md-6">
+	              	                    			<label><b>Mobile: </b></label>
+	              	                    			<span>ghjhgj</span>
+	              	                    			<input type="hidden" name="mobile" readonly="" value="mjg">
+	              	                    		</div>
+	              	                    		<div class="col-md-6">
+	              	                    			<label><b>Address Line 1: </b></label>
+	              	                    			<span>ghjhgj</span>
+	              	                    			<input type="hidden" name="email" readonly="" value="mjg">
+	              	                    		</div>
+	              	                    	</div>
+
+	              	                    	<div class="row small">
+	              	                    		<div class="col-md-6">
+	              	                    			<label><b>Address Line 2: </b></label>
+	              	                    			<span>ghjhgj</span>
+	              	                    			<input type="hidden" name="mobile" readonly="" value="mjg">
+	              	                    		</div>
+	              	                    		<div class="col-md-6">
+	              	                    			<label><b>Country: </b></label>
+	              	                    			<span>ghjhgj</span>
+	              	                    			<input type="hidden" name="email" readonly="" value="mjg">
+	              	                    		</div>
+	              	                    	</div>
+
+	              	                    	<div class="row small">
+	              	                    		<div class="col-md-6">
+	              	                    			<label><b>State: </b></label>
+	              	                    			<span>ghjhgj</span>
+	              	                    			<input type="hidden" name="mobile" readonly="" value="mjg">
+	              	                    		</div>
+	              	                    		<div class="col-md-6">
+	              	                    			<label><b>Postcode: </b></label>
+	              	                    			<span>ghjhgj</span>
+	              	                    			<input type="hidden" name="email" readonly="" value="mjg">
+	              	                    		</div>
+	              	                    	</div>
+
+	              	                    </div>
+	              	                     
+	              	                    <!-- <p class="small">
+	              	                         It is a long established fact that a reader will be distracted by the readable
+	              	                         content of a page when looking at its layout. The point of using Lorem Ipsum is
+	              	                    </p>
+	              	                    <dl class="small m-b-none">
+	              	                         <dt>Description lists</dt>
+	              	                         <dd>A description list is perfect for defining terms.</dd>
+	              	                    </dl> -->
+
+	              	                    <div class="m-t-sm">
+	              	                         <a href="#" class="text-muted"><i class="fa fa-map-pin"></i> Select Address</a>
+	              	                         |
+	              	                         <a href="#" class="text-muted" data-toggle="modal" data-target="#myModal"><i class="fa fa-plus-circle"></i> Add New</a>
+	              	                    </div>
+	              	                 </td>
+	              	              
+	              	             </tr>
+	              	             </tbody>
+	              	         </table>
+	              	     </div>
+
+	              	</div>
+	              	 
+	                <!-- bootdey.com -->
+
+	                <div class="ibox-content">
+	                    <button class="btn btn-primary pull-right"><i class="fa fa fa-shopping-cart"></i> Checkout</button>
+	                    <a href="{% url 'cart' %}"><button class="btn btn-white"><i class="fa fa-arrow-left"></i> Cart </button></a>
+	                </div>
+	            </div>
+
+
+
+	        </div>
+	        <div class="col-md-3">
+	            <div class="ibox">
+	                <div class="ibox-title">
+	                    <h5>Cart Summary</h5>
+	                </div>
+	                <div class="ibox-content">
+	                    <span>
+	                        Total
+	                    </span>
+	                    <h2 class="font-bold total_amount2">
+	                        ${{ total|floatformat:2 }}
+	                    </h2>
+
+	                    <hr>
+	                    <span class="text-muted small">
+	                        *For United States, France and Germany applicable sales tax will be applied
+	                    </span>
+	                    <div class="m-t-sm">
+	                        <div class="btn-group">
+	                        <a href="#" class="btn btn-primary btn-sm"><i class="fa fa-shopping-cart"></i> Checkout</a>
+	                        <a href="#" class="btn btn-white btn-sm"> Cancel</a>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+
+	            <div class="ibox">
+	                <div class="ibox-title">
+	                    <h5>Support</h5>
+	                </div>
+	                <div class="ibox-content text-center">
+	                    <h3><i class="fa fa-phone"></i> +43 100 783 001</h3>
+	                    <span class="small">
+	                        Please contact with us if you have any questions. We are avalible 24h.
+	                    </span>
+	                </div>
+	            </div>
+
+	            <div class="ibox">
+	                <div class="ibox-content">
+
+	                    <p class="font-bold">
+	                    Other products you may be interested
+	                    </p>
+	                    <hr>
+	                    <div>
+	                        <a href="#" class="product-name"> Product 1</a>
+	                        <div class="small m-t-xs">
+	                            Many desktop publishing packages and web page editors now.
+	                        </div>
+	                        <div class="m-t text-righ">
+
+	                            <a href="#" class="btn btn-xs btn-outline btn-primary">Info <i class="fa fa-long-arrow-right"></i> </a>
+	                        </div>
+	                    </div>
+	                    <hr>
+	                    <div>
+	                        <a href="#" class="product-name"> Product 2</a>
+	                        <div class="small m-t-xs">
+	                            Many desktop publishing packages and web page editors now.
+	                        </div>
+	                        <div class="m-t text-righ">
+
+	                            <a href="#" class="btn btn-xs btn-outline btn-primary">Info <i class="fa fa-long-arrow-right"></i> </a>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	</div>
+
+	<!-- The Modal -->
+	<div class="modal" id="myModal">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+
+	      <!-- Modal Header -->
+	      <div class="modal-header" style="background-color: orange;">
+	        <h4 class="modal-title">Add Shipping Address</h4>
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	      </div>
+
+	      	<form name="" id="" action="" method="POST">
+
+		      	<!-- Modal body -->
+		      	<div class="modal-body">
+		        	
+		        	<div class="row">
+		        		<div class="col-md-6">	        				
+		        			<label>First Name:</label>
+	        				<input type="text" name="first_name" id="first_name" class="form-control form-control-sm">
+		        		</div>
+		        		<div class="col-md-6">
+		        			<label>Last Name:</label>
+		        			<input type="text" name="first_name" id="first_name" class="form-control form-control-sm">
+		        		</div>
+		        	</div>
+
+		        	<div class="row">
+		        		<div class="col-md-6">	        				
+		        			<label>Email:</label>
+	        				<input type="text" name="email" id="email" class="form-control form-control-sm">
+		        		</div>
+		        		<div class="col-md-6">
+		        			<label>Mobile:</label>
+		        			<input type="text" name="mobile" id="mobile" class="form-control form-control-sm">
+		        		</div>
+		        	</div>
+
+		        	<div class="row">
+		        		<div class="col-md-6">	        				
+		        			<label>Address Line 1:</label>
+	        				<input type="text" name="address_line_1" id="address_line_1" class="form-control form-control-sm">
+		        		</div>
+		        		<div class="col-md-6">
+		        			<label>Address Line 2:</label>
+		        			<input type="text" name="address_line_2" id="address_line_2" class="form-control form-control-sm">
+		        		</div>
+		        	</div>
+
+		        	<div class="row">
+		        		<div class="col-md-6">	        				
+		        			<label>Country:</label>
+	        				<input type="text" name="country" id="country" class="form-control form-control-sm">
+		        		</div>
+		        		<div class="col-md-6">
+		        			<label>State:</label>
+		        			<input type="text" name="state" id="state" class="form-control form-control-sm">
+		        		</div>
+		        	</div>
+
+		        	<div class="row">
+		        		<div class="col-md-6">	        				
+		        			<label>Postcode:</label>
+	        				<input type="text" name="postcode" id="postcode" class="form-control form-control-sm">
+		        		</div>
+		        	</div>
+
+		      	</div>
+
+
+
+		      	<!-- Modal footer -->
+		      	<div class="modal-footer">
+		        	<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+		      	</div>
+
+		    </form>
+
+	    </div>
+	  </div>
+	</div>
+
+{% endblock content %}
+
+
+{% block js_block %}
+<script type="text/javascript">
+	$(function(){
+
+
+	});
+</script>
+{% endblock js_block %}
