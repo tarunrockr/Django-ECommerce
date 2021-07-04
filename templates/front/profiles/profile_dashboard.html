@@ -1,10 +1,36 @@
 {% extends 'front/base.html' %}
-
 {% load static %}
 
 {% block css_block %}
-{% endblock %}
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/w3.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/profile-sidebar.css' %}">
+<style type="text/css">
+	body{
+	    background:#eee;
+	}
+</style>
+{% endblock css_block %}
 
 {% block content %}
-	<h2>Profile page</h2>
-{% endblock %}
+	
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<!-- Profile Navbar  -->
+				{% include 'front/partials/profile_navbar.html' %}
+			</div>
+		    <div class="col-md-9">
+		    	<br>
+		    	<p class="profile_header">My Profile</p>
+
+		    </div>
+		</div>
+	</div>
+		
+
+
+{% endblock content %}
+
+
+{% block js_block %}
+{% endblock js_block %}

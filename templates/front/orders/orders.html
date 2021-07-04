@@ -1,0 +1,142 @@
+{% extends 'front/base.html' %}
+{% load static %}
+
+{% block css_block %}
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/w3.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/profile-sidebar.css' %}">
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'front/css/bootstrap.4.5.2.css' %}"> #}
+{# <link rel="stylesheet" type="text/css" href="{% static 'front/css/dataTables.bootstrap4.min.css' %}"> -->
+<style type="text/css">
+	body{
+	    background:#eee;
+	}
+</style>
+{% endblock css_block %}
+
+{% block content %}
+	
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<!-- Profile Navbar  -->
+				{% include 'front/partials/profile_navbar.html' %}
+			</div>
+		    <div class="col-md-9">
+
+		    	
+		    		<br>
+		    		<p class="profile_header">My Orders</p>
+
+		    		<br>
+
+		    		<table id="demo-table" class="table display">
+    					<thead>
+    						<tr>
+    							<th>#</th>
+    							<th>Total</th>
+    							<th>Created At</th>
+    							<th>Actions</th>
+    						</tr>
+    					</thead>
+    					<tbody></tbody>
+    				</table>
+
+		    	
+		    	
+
+		    </div>
+		</div>
+	</div>
+		
+
+
+{% endblock content %}
+
+
+{% block js_block %}
+<script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<!-- <script src="{% static 'front/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'front/js/dataTables.bootstrap4.min.js' %}"></script> -->
+<script type="text/javascript">
+	
+	$(document).ready(function () {
+		/* Here begins the DataTable configuration. */
+		$('#demo-table').DataTable({
+			/* Tell the DataTable that we need server-side processing. */
+			// "sServerMethod": "get",
+			"processing": true,
+			"serverSide": true,         
+	  		//"deferRender": true,           
+	  		//"iDisplayLength": 25,
+	        //paging: true,
+			/* Set up the data source */
+			ajax: {
+				url: "{% url 'orders_data_ajax' %}"
+			},
+			/* And set up the columns. Note that they must be identified by a "name" attribute,
+			   with the value matching the columns in your Django view. The "data" attribute selects which record value will be used,
+			   and should be the same value than for the "name" attribute. */
+			columns: [
+			            { "data": "id", "bSortable": false},
+			            { "data": "total"},
+			            { "data": "created_at"},
+			            { "data": "actions", "bSortable": false},
+			        ]
+		});
+	});
+
+	$(document).ready(function () {
+
+
+	   //      $("#tb").DataTable({
+	   //          "paging": true,
+	   //          "searching": true,
+	   //          "processing": true,
+	   //          "serverSide": true,
+	   //          // "destroy": true,
+	   //          // "pageLength": 10,
+	   //          "ordering": false,
+				// // "renderer": "bootstrap", // Rendering style: Bootstrap and jquery-ui
+				// // "pagingType": "simple_numbers", // Paging style: simple, simple_numbers, full, full_numbers
+				// //            "autoWidth": true,
+				// // "stateSave": true, // Keep page turning state, used in combination with comTable.fnDraw (false);
+	   //          "ajax": {
+	   //              "url": "{% url 'orders_data_ajax' %}",
+	   //              "type": "post"
+	   //          },
+	   //          // "columns": [// If the returned data is a dictionary, this property needs to be set
+				// //   { "data": "id" },
+	   //          //   { "data": "name" },
+	   //          //   { "data": "dept" },
+	   //          //   { "data": "phone" }
+	   //          //    ]
+	   //          "columnDefs": [// Column rendering
+	   //              // {
+	   //              //     "render": function (data, type, row) {// data: content of this field row: content of this line
+	   //              //         if (data == "10.199.50.125") {
+	   //              //             return "<span style='color: red'>" + data + "</span>";
+	   //              //         } else {
+	   //              //             return data;
+	   //              //         }
+	   //              //     },
+	   //              //     "targets": 0 // Specify the rendering column
+	   //              // },
+	   //              {
+	   //                  "render": function (data, type, row) {
+	   //                      // if (row [0] == "10.199.50.139") {// Set the color of this field according to IP
+	   //                      //     return "<span style='color: #adff2f'>" + data + "</span>";
+	   //                      // } else {
+	   //                          return data;
+	   //                      //}
+	   //                  },
+	   //                  "targets": 1 // Specify the rendering column
+	   //              }
+	   //          ]
+	 
+	   //      });
+
+
+	    });
+</script>
+{% endblock js_block %}

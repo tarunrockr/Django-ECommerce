@@ -40,6 +40,11 @@ INSTALLED_APPS = [
     'store.apps.StoreConfig',
     'profiles.apps.ProfilesConfig',
     'carts.apps.CartsConfig',
+    'orders.apps.OrdersConfig',
+
+    # Custom Admin apps
+    # 'admin_login.apps.AdminloginConfig',
+    # 'admin_profile.apps.AdminProfileConfig',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +55,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'profiles.middlewares.my_middleware',
+    # 'profiles.middlewares.MyMiddleware',
+    # 'profiles.middlewares.MyMiddleware1',
+    # 'profiles.middlewares.MyMiddleware2',
+    # 'profiles.middlewares.MyMiddleware3',
+    # 'profiles.middlewares.MyProcessMiddleware',
+    # 'profiles.middlewares.MyExceptionMiddleware',
+    'profiles.middlewares.MyTemplateResponseMiddleware',
 ]
 
 ROOT_URLCONF = 'eshop.urls'
@@ -170,3 +183,10 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_URL = 'login.show'
 # Used after successful login
 LOGIN_REDIRECT_URL = 'profile.dashboard'
+
+
+
+
+STRIPE_PUBLIC_KEY = ""
+STRIPE_SECRET_KEY = ""
+STRIPE_WEBHOOK_SECRET = ""

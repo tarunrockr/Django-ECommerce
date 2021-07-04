@@ -1,12 +1,19 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from store.models import Product
-from .models import Cart, CartItem
+from .models import Cart, CartItem, CustomerAddress
+from orders.models import Order, OrderItem
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
 import json
 import ast
+
+import stripe
+from django.conf import settings 
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Create your views here.
 
@@ -524,6 +531,248 @@ def remove_cart_quantity(request):
 
 # Checkout page functions 
 
+# Show checkout page
 def checkout(request):
 
-	return render(request,"front/checkout/checkout.html",{})
+	if request.user.is_authenticated:
+
+		user_id = request.session['user_id']
+		#Fetch cart data
+		cart_data = Cart.objects.get(user_id=user_id)
+
+		STRIPE_PUBLIC_KEY = settings.STRIPE_PUBLIC_KEY
+		return render(request,"front/checkout/checkout.html",{'cart_data': cart_data, 'user_id': user_id, 'STRIPE_PUBLIC_KEY': STRIPE_PUBLIC_KEY })
+
+def create_checkout_session(request):
+
+	#Fetch total amount
+	user_id = request.session['user_id']
+	#Fetch cart data
+	cart_data = Cart.objects.get(user_id=user_id)
+
+	# we can give any custome information in metadata  
+
+	YOUR_DOMAIN = 'http://127.0.0.1:8000/'
+	checkout_session = stripe.checkout.Session.create(
+	    payment_method_types=['card'],
+	    line_items=[
+	        {
+	            'price_data': {
+	                'currency': 'usd',
+	                'unit_amount': (int(cart_data.total)*100),
+	                'product_data': {
+	                    'name': 'Stubborn Attachments',
+	                    # 'images': ['https://i.imgur.com/EHyR2nP.png'],
+	                },
+	            },
+	            'quantity': 1,
+	        },
+	    ],
+	    metadata={
+	    	'cart_id': cart_data.id,
+	    	'user_id': user_id
+	    },
+	    mode='payment',
+	    success_url=YOUR_DOMAIN + 'checkout_success',
+	    cancel_url=YOUR_DOMAIN + 'checkout_success',
+	)
+
+	return JsonResponse({ 'id': checkout_session.id })
+
+def checkout_post(request):
+	return HttpResponse("In checkout post")
+
+def checkout_success(request):
+	return render(request, 'front/checkout/success.html', {})
+
+def checkout_cancel(request):
+	return render(request, 'front/checkout/cancel.html', {})
+
+@csrf_exempt
+def stripe_webhook(request):
+  	payload = request.body
+  	sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+  	event = None
+
+  	try:
+  		event = stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_WEBHOOK_SECRET)
+  	except ValueError as e:
+  		# Invalid payload
+  		return HttpResponse(status=400)
+  	except stripe.error.SignatureVerificationError as e:
+  		# Invalid signature
+  		return HttpResponse(status=400)
+
+  	# Handle the checkout.session.completed event
+  	if event['type'] == 'checkout.session.completed':
+  		stripe_session = event['data']['object']
+
+  		# Fulfill the purchase...
+  		order_status = save_order(stripe_session)
+  		print(stripe_session)
+
+  	# Passed signature verification
+  	return HttpResponse(status=200)
+
+def save_order(stripe_response):
+
+	# print("Fulfilling order")
+	transaction_id = stripe_response.id
+	user_id        = stripe_response.metadata.user_id
+	cart_id        = stripe_response.metadata.cart_id
+
+	# Fetch all record of cart
+	try:
+		cart_data = Cart.objects.get(id=cart_id)
+	except Cart.DoesNotExist:
+		cart_data = None
+
+	if cart_data is not None:
+
+		# Insert into orders table
+		order = Order(user_id=user_id, total=cart_data.total, transaction_id=transaction_id)
+		order.save()
+		latest_order_id = Order.objects.latest('id')
+		# Fetch all record of cart items
+		try:
+			cart_items = CartItem.objects.filter(cart_id=cart_data.id)
+		except CartItem.DoesNotExist:
+			cart_items = None
+
+		if cart_items is not None:
+			# Insert into order detail table
+			for data in cart_items:
+				product_info = Product.objects.get(id=data.product_id)
+				order_item = OrderItem(order_id=latest_order_id.pk, product_id=data.product_id, quantity=data.quantity, product_price=product_info.price, product_total=data.product_total)
+				order_item.save()
+
+		# Removing the current cart and its item data
+		cart_data.delete()
+		cart_items.delete()
+
+	return True
+
+
+def	add_shipping_address_ajax(request):
+
+	if request.user.is_authenticated:
+
+		
+		user_list = request.POST['form_data'].split("&")
+		user_dict = {}
+		for ele in user_list:
+			user_dict[ele.split("=")[0]] = ele.split("=")[1]
+
+		user_id        = request.session['user_id']
+		first_name     = user_dict['first_name']
+		last_name      = user_dict['last_name']
+		email          = user_dict['email']
+		mobile         = int(user_dict['mobile'])
+		address_line_1 = user_dict['address_line_1']
+		address_line_2 = user_dict['address_line_2'] if 'address_line_2' in user_dict else ''
+		country        = user_dict['country']
+		state          = user_dict['state']
+		postcode       = user_dict['postcode']
+
+		customer_address = CustomerAddress(user_id=user_id, first_name=first_name, last_name=last_name, email=email, mobile=mobile, address_line1=address_line_1, address_line2=address_line_2, country=country, state=state, postcode=postcode, is_shipping=1)
+		customer_address.save()
+		#last_insert_id = CustomerAddress.objects.latest('id')
+		data = [{'success': True, 'message': "Address added successfully", 'login': True, 'data': ''}]
+		return JsonResponse(data, safe=False)
+
+	else:
+
+		data = [{'success': False, 'message': "Please login to continue", 'login': False}]
+		return JsonResponse(data, safe=False)
+
+
+def fetch_shipping_address_ajax(request):
+
+	if request.user.is_authenticated:
+
+		user_id = request.POST['user_id']
+
+		# Fetch existing shipping address
+		all_address = CustomerAddress.objects.filter(user_id=user_id, is_shipping=1)
+		address='';
+		if all_address:
+			for add in all_address:
+				
+				if add.is_default_shipping == 1:
+					checked = 'checked'
+				else:
+					checked = ''
+
+				address += '<div class="card-new bg-light mb-3">'
+				address += ' <div class="card-body">'
+				address += f'  <h5 class="card-title">Name: {add.first_name} {add.last_name}  | <label>Select: <input type="radio" name="select_address_id" id="select_address_id" {checked} class="select_address_radio" value="{add.id}"></label></h5>'
+				
+				address += '   <div class="row">'
+				address += '    <div class="col-md-6">'
+				address += '	 <label><b>Email:</b></label>'
+				address += f'     <span>{add.email}</span>'
+				address += '    </div>'
+				address += '    <div class="col-md-6">'
+				address += '     <label><b>Mobile:</b></label>'
+				address += f'     <span>{add.mobile}</span>'
+				address += '    </div>'
+				address += '   </div>'
+
+				address += '   <div class="row">'
+				address += '    <div class="col-md-3">'
+				address += '	 <label><b>Address Line 2:</b></label>'
+				address += '    </div>'
+				address += '    <div class="col-md-9">'
+				address += f'     <span>{add.address_line1}</span>'
+				address += '    </div>'
+				address += '   </div>'
+
+				address += '   <div class="row">'
+				address += '    <div class="col-md-3">'
+				address += '	 <label><b>Address Line 2:</b></label>'
+				address += '    </div>'
+				address += '    <div class="col-md-9">'
+				address += f'     <span>{add.address_line2}</span>'
+				address += '    </div>'
+				address += '   </div>'
+
+				address += '   <div class="row">'
+				address += '    <div class="col-md-4">'
+				address += '	 <label><b>Country:</b></label>'
+				address += f'     <span>{add.country}</span>'
+				address += '    </div>'
+				address += '    <div class="col-md-4">'
+				address += '     <label><b>State:</b></label>'
+				address += f'     <span>{add.state}</span>'
+				address += '    </div>'
+				address += '    <div class="col-md-4">'
+				address += '     <label><b>Postcode:</b></label>'
+				address += f'     <span>{add.postcode}</span>'
+				address += '    </div>'
+				address += '   </div>'
+
+				address += ' </div>'
+				address += '</div>'
+		else:
+			address += '<div class="card-new bg-light mb-3">'
+			address += ' <div class="card-body">'
+
+			address += '   <div class="row">'
+			address += '    <div class="col-md-12">'
+			address += '     <div class="alert alert-info" role="alert">'
+			address += '     	Address is not available  <a href="#" class="alert-link">Add new address.</a>'
+			address += '     </div>'
+			address += '    </div>'
+			address += '   </div>'
+
+			address += ' </div>'
+			address += '</div>'
+
+		# serialized_obj = serializers.serialize('json', all_address)
+
+		data = [{'success': True, 'message': 'in function', 'login': True,'data': address}]
+		return JsonResponse(data, safe=False)
+	else:
+		data = [{'success': True, 'message': 'Please login to continue', 'login': False}]
+		return JsonResponse(data, safe=False)
+

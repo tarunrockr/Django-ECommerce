@@ -364,7 +364,12 @@
 		    background-color: #717fe0 !important;
 		}
 
-
+		label.error {
+		  color: #a94442;
+		  /*background-color: #f2dede;
+		  border-color: #ebccd1;
+		  padding:1px 20px 1px 20px;*/
+		}
 		
 	</style>
 {% endblock css_block %}
@@ -399,8 +404,10 @@
 		                </div>
 		            </div> -->
 
+		            <!-- <form name="checkout_form" id="checkout_form" method="POST" action="{% url 'checkout.post' %}"> -->
+
 	              	<div class="ibox-content">
-	              	     <div class="table-responsive">
+	              	    <div class="table-responsive">
 	              	         <table class="table shoping-cart-table">
 	              	             <tbody>
 	              	             <tr>
@@ -483,9 +490,10 @@
 	              	                    </dl> -->
 
 	              	                    <div class="m-t-sm">
-	              	                         <a href="#" class="text-muted"><i class="fa fa-map-pin"></i> Select Address</a>
+	              	                         <a href="#" class="text-muted select_address"><i class="fa fa-map-pin"></i> Select Address</a>
 	              	                         |
 	              	                         <a href="#" class="text-muted" data-toggle="modal" data-target="#myModal"><i class="fa fa-plus-circle"></i> Add New</a>
+	              	                         <input type="hidden" name="user_id" id="user_id" value="{{ user_id }}" >
 	              	                    </div>
 	              	                 </td>
 	              	              
@@ -495,13 +503,26 @@
 	              	     </div>
 
 	              	</div>
+
+	              	<div class="ibox-content">
+	              		<section>
+	              		  <div class="product">
+	              		    <div class="description">
+	              		      <h5>Total Amount: ${{ cart_data.total }}</h5>
+	              		    </div>
+	              		  </div>
+	              		</section>
+	              	</div>
 	              	 
 	                <!-- bootdey.com -->
 
 	                <div class="ibox-content">
-	                    <button class="btn btn-primary pull-right"><i class="fa fa fa-shopping-cart"></i> Checkout</button>
+	                    <button type="submit" class="btn btn-primary pull-right" id="checkout-button"><i class="fa fa-arrow-circle-right"></i> Pay Now</button>
 	                    <a href="{% url 'cart' %}"><button class="btn btn-white"><i class="fa fa-arrow-left"></i> Cart </button></a>
 	                </div>
+
+	                <!-- </form> -->
+
 	            </div>
 
 
@@ -517,7 +538,7 @@
 	                        Total
 	                    </span>
 	                    <h2 class="font-bold total_amount2">
-	                        ${{ total|floatformat:2 }}
+	                        ${{ cart_data.total|floatformat:2 }}
 	                    </h2>
 
 	                    <hr>
@@ -580,7 +601,7 @@
 	</div>
 	</div>
 
-	<!-- The Modal -->
+	<!-- The Add Shipping Address Modal -->
 	<div class="modal" id="myModal">
 	  <div class="modal-dialog">
 	    <div class="modal-content">
@@ -591,7 +612,7 @@
 	        <button type="button" class="close" data-dismiss="modal">&times;</button>
 	      </div>
 
-	      	<form name="" id="" action="" method="POST">
+	      	<form name="add_shipping_address" id="add_shipping_address" action="{% url 'add_shipping_address' %}" method="POST">
 
 		      	<!-- Modal body -->
 		      	<div class="modal-body">
@@ -603,7 +624,7 @@
 		        		</div>
 		        		<div class="col-md-6">
 		        			<label>Last Name:</label>
-		        			<input type="text" name="first_name" id="first_name" class="form-control form-control-sm">
+		        			<input type="text" name="last_name" id="last_name" class="form-control form-control-sm">
 		        		</div>
 		        	</div>
 
@@ -624,7 +645,7 @@
 	        				<input type="text" name="address_line_1" id="address_line_1" class="form-control form-control-sm">
 		        		</div>
 		        		<div class="col-md-6">
-		        			<label>Address Line 2:</label>
+		        			<label>Address Line 2(Optional):</label>
 		        			<input type="text" name="address_line_2" id="address_line_2" class="form-control form-control-sm">
 		        		</div>
 		        	</div>
@@ -649,11 +670,9 @@
 
 		      	</div>
 
-
-
 		      	<!-- Modal footer -->
 		      	<div class="modal-footer">
-		        	<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+		        	<button type="submit" class="btn">Save</button>
 		      	</div>
 
 		    </form>
@@ -662,13 +681,261 @@
 	  </div>
 	</div>
 
+	<!-- Select Shipping Address Modal -->
+	<div id="selectAddressModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog modal-lg">
+
+	    <!-- Modal content-->
+	    <div class="modal-content">
+
+	      <div class="modal-header" style="background-color: orange;">
+	        <h4 class="modal-title">Select Address</h4>
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	      </div>
+
+	      <div class="modal-body shipping_address_box">
+
+	      	<div class="card-new bg-light mb-3">
+	      	  <div class="card-body">
+
+	      	    <h5 class="card-title">Name: Abc Def  | <label>Select: <input type="radio" name="select_address" id="" class="select_address" value="1"></label></h5>
+
+	      	    <div class="row">
+	      	    	<div class="col-md-6">
+	      	    		<label><b>Email:</b></label>
+	      	    		<span>adc@gmail.com</span>
+	      	    	</div>
+	      	    	<div class="col-md-6">
+	      	    		<label><b>Mobile:</b></label>
+	      	    		<span>8562312456</span>
+	      	    	</div>
+	      	    </div>
+
+	      	    <div class="row">
+	      	    	<div class="col-md-3">
+	      	    		<label><b>Address line 1:</b></label>
+	      	    		</div>
+	      	    	<div class="col-md-9">
+	      	    		<span>gfhfhg jhgjhgjh hgjh nhhgj njh hjgjygu hgjhg gjhgu hghjgu hjgj jhgj mhbh mbmn hj mgjhg mgjh mhgjh</span>
+	      	    	</div>
+	      	    </div>
+
+	      	    <div class="row">
+	      	    	<div class="col-md-3">
+	      	    		<label><b>Address line 1:</b></label>
+	      	    		</div>
+	      	    	<div class="col-md-9">
+	      	    		<span>gfhfhg jhgjhgjh hgjh nhhgj njh hjgjygu hgjhg gjhgu hghjgu hjgj jhgj mhbh mbmn hj mgjhg mgjh mhgjh</span>
+	      	    	</div>
+	      	    </div>
+	      	    <div class="row">
+	      	    	<div class="col-md-4">
+	      	    		<label><b>Country:</b></label>
+	      	    		<span>India</span>
+	      	    	</div>
+	      	    	<div class="col-md-4">
+	      	    		<label><b>State:</b></label>
+	      	    		<span>Rajasthan</span>
+	      	    	</div>
+	      	    	<div class="col-md-4">
+	      	    		<label><b>Postcode:</b></label>
+	      	    		<span>304251</span>
+	      	    	</div>
+	      	    </div>
+
+	      	  </div>
+	      	</div>
+
+	      	<div class="card-new bg-light mb-3">
+	      	  <div class="card-body">
+	      	    <h5 class="card-title">Light card title</h5>
+	      	    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+	      	  </div>
+	      	</div>
+	        
+	      </div>
+
+	    </div>
+
+	  </div>
+	</div>
+	{% csrf_token %}
+
 {% endblock content %}
 
 
 {% block js_block %}
+<script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <script type="text/javascript">
+	
+	const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+	// STRIPE CODE, START
+
+	// Create an instance of the Stripe object with your publishable API key
+	var stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+	var checkoutButton = document.getElementById("checkout-button");
+
+	checkoutButton.addEventListener("click", function () {
+	  fetch("{% url 'checkout.session' %}", {
+	    method: "POST",
+	    headers: {
+	    	'X-CSRFToken': csrftoken
+	    }
+	  })
+	    .then(function (response) {
+	      return response.json();
+	    })
+	    .then(function (session) {
+	      return stripe.redirectToCheckout({ sessionId: session.id });
+	    })
+	    .then(function (result) {
+	      // If redirectToCheckout fails due to a browser or network
+	      // error, you should display the localized error message to your
+	      // customer using error.message.
+	      if (result.error) {
+	        alert(result.error.message);
+	      }
+	    })
+	    .catch(function (error) {
+	      console.log("Error:", error);
+	    });
+	});
+
+	//STRIPE CODE, END
+
 	$(function(){
 
+		$(document).on('click', '.select_address', function(){
+
+			$('#selectAddressModal').modal('show');
+			var user_id = $("#user_id").val();
+
+			$.ajax({
+				url: "{% url 'fetch_shipping_address' %}",
+				method: "POST",
+				data: { csrfmiddlewaretoken: '{{ csrf_token }}', user_id: user_id },
+				success: function(data){
+					//console.log(data); return false;
+
+					if(data[0].success == true){
+						$('.shipping_address_box').html(data[0].data);
+					}
+
+					// $.alert({
+					// 	boxWidth: '30%',
+					// 	useBootstrap: false,
+
+					// 	animation: 'bottom',
+					// 	closeAnimation: 'top',
+
+					// 	icon: 'fa fa-check-circle',
+					//     title: data[0].message,
+					//     //content: '',
+					//     content: false,
+					//     type: 'green',
+					//     columnClass: 'small',
+					//     autoClose: 'ok|100',
+					//     buttons: { ok: { isHidden: true,  } }
+					// });
+				}
+
+			});
+
+		});
+
+		$("#add_shipping_address").validate({
+
+			rules:{
+				first_name:{
+					required: true
+				},
+				last_name:{
+					required:true
+				},
+				email:{
+					required: true,
+					email: true
+				},
+				mobile:{
+					required:true
+				},
+				address_line_1:{
+					required: true
+				},
+				country:{
+					required: true
+				},
+				state:{
+					required:true
+				},
+				postcode:{
+					required:true
+				}
+			},
+			messages:{
+				first_name:{
+					required: "First Name Field required"
+				},
+				last_name:{
+					required: "Last Name Field required"
+				},
+				email:{
+					required: "Email Field required",
+					email: "Email is not valid"
+				},
+				mobile:{
+					required: "Mobile Field required",
+				},
+				address_line_1:{
+					required: "Address Field required",
+				},
+				country:{
+					required: "Country Field required",
+				},
+				state:{
+					required: "State Field required",
+				},
+				postcode:{
+					required: "Postcode Field required",
+				}
+			},
+			submitHandler: function(form){
+
+				$.ajax({
+					url: "{% url 'add_shipping_address' %}",
+					method: "POST",
+					data: { csrfmiddlewaretoken: '{{ csrf_token }}', form_data: $(form).serialize() },
+					success: function(data){
+						//console.log(data);
+
+						if(data[0].success == true){
+							$('#add_shipping_address').trigger("reset");
+							$('#myModal').modal('hide');
+						}
+
+						$.alert({
+							boxWidth: '30%',
+							useBootstrap: false,
+
+							animation: 'bottom',
+							closeAnimation: 'top',
+
+							icon: 'fa fa-check-circle',
+						    title: data[0].message,
+						    //content: '',
+						    content: false,
+						    type: 'green',
+						    columnClass: 'small',
+						    autoClose: 'ok|100',
+						    buttons: { ok: { isHidden: true,  } }
+						});
+					}
+
+				});
+			}
+
+		});
 
 	});
 </script>

@@ -7,6 +7,7 @@ from django.contrib import messages
 from .forms import LoginForm
 from django.contrib.auth import authenticate, login 
 from django.contrib.auth.decorators import login_required, user_passes_test
+from profiles import signals
 
 # Create your views here.
 
@@ -100,7 +101,7 @@ def login_post(request):
 			email    = form.cleaned_data['email']
 			password = form.cleaned_data['password']
 
-			user = authenticate(request, email=email, password=password)
+			user = authenticate(request, email=email, password=password, login_type='frontend')
 
 			if user is not None:
 				login(request, user)
@@ -136,5 +137,8 @@ def logout(request):
 @login_required()
 def  user_profile(request):
 	#return HttpResponse(request.session['email'])
+	
+	# Calling or sending notification signal
+	signals.notification.send(sender = None, request=request, user=["Tarun","Kumar"])
 
 	return render(request, 'front/profiles/profile_dashboard.html',{})
