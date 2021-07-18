@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'orders.apps.OrdersConfig',
 
     # Custom Admin apps
-    # 'admin_login.apps.AdminloginConfig',
-    # 'admin_profile.apps.AdminProfileConfig',
+    'admin_login.apps.AdminLoginConfig',
+    'admin_profile.apps.AdminProfileConfig',
 ]
 
 MIDDLEWARE = [
@@ -187,6 +187,6 @@ LOGIN_REDIRECT_URL = 'profile.dashboard'
 
 
 
-STRIPE_PUBLIC_KEY = ""
-STRIPE_SECRET_KEY = ""
-STRIPE_WEBHOOK_SECRET = ""
+STRIPE_PUBLIC_KEY = "pk_test_TvIjw35XZPEI9l6nCzurkjgL00w0EDWvhF"
+STRIPE_SECRET_KEY = "sk_test_mlWE6vvLPgDPZexbqPHWuhgz0007W6lAz3"
+STRIPE_WEBHOOK_SECRET = "whsec_i0CVpuOJg1YGAbPMDa1qJkcK6MuBR8qI"
