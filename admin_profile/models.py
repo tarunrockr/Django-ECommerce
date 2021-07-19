@@ -1,4 +1,5 @@
 from django.db import models
+from .managers import CustomManager
 
 # Create your models here.
 
@@ -46,4 +47,23 @@ from django.db import models
 # class MyEmployee(Employee):
 # 	class Meta:
 # 		proxy = True
+
+
+
+# Example of custom manager
+class TestStudent(models.Model):
+	name = models.CharField(max_length=200)
+	roll = models.IntegerField()
+
+	# Default manager of django
+	objects = models.Manager()
+
+	# Changed manager name to 'students' of django (Custom: created by us)
+	# students= models.Manager()
+
+	# Using custom manager from managers file
+	students  = CustomManager()
+
+
+
 
