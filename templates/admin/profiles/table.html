@@ -1,0 +1,83 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+
+
+<div class="card">
+ <div class="card-header">
+   <h3 class="card-title">Striped Full Width Table</h3>
+ </div>
+ <!-- /.card-header -->
+ <div class="card-body p-0">
+   <div class="container col-md-7">
+     <h2>Basic Table</h2>
+     <p>The .table class adds basic styling (light padding and only horizontal dividers) to a table:</p>            
+     <table class="table">
+       <thead>
+         <tr>
+           <th>ID</th>
+           <th>Name</th>
+           <th>Roll</th>
+         </tr>
+       </thead>
+       <tbody>
+         {% for ele in student %}
+           <tr>
+             <td>{{ ele.id }}</td>
+             <td>{{ ele.name }}</td>
+             <td>{{ ele.roll }}</td>
+           </tr>
+         {% endfor %}
+       </tbody>
+     </table>
+   </div>
+ </div>
+ <!-- /.card-body -->
+ </div>
+
+ <br>
+
+ <div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Striped Full Width Table</h3>
+  </div>
+  <!-- /.card-header -->
+  <div class="card-body p-0">
+    <div class="container col-md-7">
+      <h2>Basic1 Table</h2>
+      <p>The .table class adds basic styling (light padding and only horizontal dividers) to a table:</p>            
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Roll</th>
+            <th>CITY</th>
+            <th>Marks</th>
+            <th>passdate</th>
+            <th>new date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for usr in usr %}
+            <tr>
+              <td>{{ usr.id }}</td>
+              <td>{{ usr.name }}</td>
+              <td>{{ usr.roll }}</td>
+              <td>{{ usr.city }}</td>
+              <td>{{ usr.marks }}</td>
+              <td>{{ usr.ndatetime }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /.card-body -->
+  </div>
+
+  <br>
+
+ 
+
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'front/base.html' %}
+
+{% load static %}
+
+{% block css_block %}
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/login.css' %}">
+<style type="text/css">
+      .error_class{
+         color: red;
+         padding-left: 10px;
+         font-weight: bold;
+      }
+</style>
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<form action="{% url 'register.post' %}" method="post" style="border:1px solid #ccc">
+				  <div class="container">
+
+				  	<div class="row">
+				  	    {% for message in messages %}
+				  	         <div class="alert {{ message.tags }} alert-dismissible alert-class " role="alert">
+				  	             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				  	                 <span aria-hidden="true">&times;</span>
+				  	             </button>
+				  	             {{ message | safe }}
+				  	         </div>
+				  	     {% endfor %}
+				  	</div>
+
+				  	<div class="header_cls">
+					    <h2 class="header_h1_cls">Sign Up</h2>
+					    <p class="header_p_cls">Please fill in this form to create an account.</p>
+					</div>
+				    <hr>
+
+				    <div class="row">
+
+				    	{% csrf_token %}
+
+				    	<div class="col-md-6">
+					    	<label for="first_name" class="leb"><b>First Name</b></label>
+						    <input type="text" placeholder="Enter First Name" class="inp" name="first_name" value="{{ prev.first_name }}" >
+						    {% if error.first_name %}
+						       <span class="error_class">{{ error.first_name }}</span>
+						    {% endif %}
+					    </div>
+
+					    <div class="col-md-6">
+					    	<label for="last_name" class="leb"><b>Last Name</b></label>
+						    <input type="text" placeholder="Enter Last Name" class="inp" name="last_name" value="{{ prev.last_name }}" >
+						    {% if error.last_name %}
+						       <span class="error_class">{{ error.last_name }}</span>
+						    {% endif %}
+					    </div>
+
+				    </div>
+
+				    <div class="row">
+
+				    	<div class="col-md-6">
+					    	<label for="mobile" class="leb"><b>Mobile</b></label>
+						    <input type="text" placeholder="Enter Mobile" class="inp" name="mobile" value="{{ prev.mobile }}">
+						    {% if error.mobile %}
+						       <span class="error_class">{{ error.mobile }}</span>
+						    {% endif %}
+					    </div>
+
+					    <div class="col-md-6">
+					    	<label for="email" class="leb"><b>Email</b></label>
+						    <input type="text" placeholder="Enter Email" class="inp" name="email" value="{{ prev.mobile }}">
+						    {% if error.email %}
+						       <span class="error_class">{{ error.email }}</span>
+						    {% endif %}
+					    </div>
+
+				    </div>
+					    
+				    <div class="row">
+
+				    	<div class="col-md-6">
+						    <label for="password" class="leb"><b>Password</b></label>
+						    <input type="password" placeholder="Enter Password" class="inp" name="password" >
+						    {% if error.password %}
+						       <span class="error_class">{{ error.password }}</span>
+						    {% elif error.password_unmatch %}
+						       <span class="error_class">{{ error.password_unmatch }}</span>
+						    {% endif %}
+						 </div>
+
+						 <div class="col-md-6">
+						    <label for="confirm_password" class="leb"><b>Confirm Password</b></label>
+						    <input type="password" placeholder="Enter Password" class="inp" name="confirm_password" >
+						    {% if error.confirm_password %}
+						       <span class="error_class">{{ error.confirm_password }}</span>
+						    {% endif %}
+						 </div>
+
+					</div>
+				    
+				    <p>If already registered click here to <a href="{% url 'login.show' %}" style="color:dodgerblue">LOGIN</a>.</p>
+
+				    <div class="clearfix">
+				      <button type="submit" class="btn login_btn">Sign Up</button>
+				    </div>
+				  </div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

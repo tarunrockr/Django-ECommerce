@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- /.header script -->
+  {% include 'admin/partials/header_script.html' %}
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <!-- Preloader -->
+  <!-- <div class="preloader flex-column justify-content-center align-items-center">
+    <img class="animation__shake" src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+  </div> -->
+
+  <!-- Navbar -->
+  
+  <!-- /.navbar -->
+  {% include 'admin/partials/navbar.html' %}
+  <!-- Main Sidebar Container -->
+  {% include 'admin/partials/sidebar.html' %}
+      
+
+  <!-- Content Wrapper. Contains page content -->
+  {% block content %}
+  {% endblock %}
+  <!-- /.content-wrapper -->
+  <!-- /.footer -->
+  {% include 'admin/partials/footer.html' %}
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<!-- /.footer script -->
+{% include 'admin/partials/footer_script.html' %}
+</body>
+</html>

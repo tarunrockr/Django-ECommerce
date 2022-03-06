@@ -1,0 +1,54 @@
+#loading{
+	text-align: center;
+	background: url("/static/front/images/loader.gif") no-repeat center;
+	height: 150px;
+}
+
+#lblCartCount {
+    font-size: 12px;
+    background: #4caf50;
+    color: #fff;
+    padding: 0 5px;
+    vertical-align: top;
+    margin-left: -10px;
+}
+.badge {
+  padding-left: 9px;
+  padding-right: 9px;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+}
+
+.checkout_header{
+  background-color: orange;
+  padding: 5px;
+  padding-left: 20px;
+  border-radius: 4px;
+}
+
+.card-new{
+   border: 1px !important;
+}
+
+.card_body_new{
+  background-color: #9e9e9e9e !important;
+  border-radius: 5px !important;
+}
+
+.profile_header{
+  text-align: center;
+  background-color: orange;
+  color: #191000;
+  padding: 7px;
+  border-radius: 4px;
+  font-weight: 700!important;
+}
+
+.profile_tab_hide{
+  display: none;
+}
+
+.profile_tab_show{
+  display: block;
+}

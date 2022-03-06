@@ -1,0 +1,75 @@
+{% extends 'front/base.html' %}
+
+{% load static %}
+
+{% block css_block %}
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/login.css' %}">
+<style type="text/css">
+      .error_class{
+         color: red;
+         padding-left: 10px;
+         font-weight: bold;
+      }
+</style>
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3"></div>
+			<div class="col-md-6">
+				<form action="{% url 'login.post' %}" method="post" style="border:1px solid #ccc" novalidate>
+				  <div class="container">
+
+				  	<div class="row">
+				  		<div class="col-md-12">
+				  	    {% for message in messages %}
+				  	        <div class="alert {{ message.tags }} alert-dismissible alert-class" style="width: 100%;" role="alert">
+				  	             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				  	                 <span aria-hidden="true">&times;</span>
+				  	             </button>
+				  	             {{ message | safe }}
+				  	        </div>
+				  	    {% endfor %}
+				  	 	</div>
+				  	</div>
+
+				  	<div class="header_cls">
+					    <h2 class="header_h1_cls">Sign In</h2>
+					    <p class="header_p_cls">Please fill in this form to login.</p>
+					</div>
+				    <hr>
+
+				    <div class="row">
+
+				    	{% csrf_token %}
+
+				    	<div class="col-md-12">
+					    	<label for="{{ form.email.id_for_label }}" class="leb"><b>Email</b></label>
+						    {# <input type="text" placeholder="Enter Email" class="inp" name="first_name" value="" > #}
+						    {{ form.email }}
+					    </div>
+
+				    </div>
+					    
+				    <div class="row">
+
+				    	<div class="col-md-12">
+						    <label for="{{ form.password.id_for_label }}" class="leb"><b>Password</b></label>
+						    {# <input type="password" placeholder="Enter Password" class="inp" name="password" > #}
+						    {{ form.password }}
+						 </div>
+
+					</div>
+				    
+				    <p>If not registered click here to <a href="{% url 'register.show' %}" style="color:dodgerblue">REGISTER</a>.</p>
+
+				    <div class="clearfix">
+				      <button type="submit" class="btn login_btn">Sign In</button>
+				    </div>
+				  </div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

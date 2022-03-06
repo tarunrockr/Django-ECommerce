@@ -1,0 +1,13 @@
+asgiref==3.2.10
+certifi==2021.5.30
+chardet==4.0.0
+Django==3.0.7
+idna==2.10
+mysql-connector==2.2.9
+mysqlclient @ file:///C:/Users/Tarun%20Sharma/AppData/Local/Programs/Python/Python37-32/mysqlclient-1.4.6-cp37-cp37m-win32.whl
+Pillow==7.1.2
+pytz==2020.1
+requests==2.25.1
+sqlparse==0.3.1
+stripe==2.58.0
+urllib3==1.26.5

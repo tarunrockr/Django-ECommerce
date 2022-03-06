@@ -38,6 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'store.apps.StoreConfig',
+    'profiles.apps.ProfilesConfig',
+    'carts.apps.CartsConfig',
+    'orders.apps.OrdersConfig',
+
+    # Custom Admin apps
+    'admin_login.apps.AdminLoginConfig',
+    'admin_profile.apps.AdminProfileConfig',
 ]
 
 MIDDLEWARE = [
@@ -48,6 +55,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'profiles.middlewares.my_middleware',
+    # 'profiles.middlewares.MyMiddleware',
+    # 'profiles.middlewares.MyMiddleware1',
+    # 'profiles.middlewares.MyMiddleware2',
+    # 'profiles.middlewares.MyMiddleware3',
+    # 'profiles.middlewares.MyProcessMiddleware',
+    # 'profiles.middlewares.MyExceptionMiddleware',
+    'profiles.middlewares.MyTemplateResponseMiddleware',
 ]
 
 ROOT_URLCONF = 'eshop.urls'
@@ -64,6 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'carts.context_processors.context_processors.cart_item_count',
             ],
         },
     },
@@ -87,6 +103,9 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
+        'OPTIONS': {
+                    'sql_mode': 'traditional',
+                }
     }
 }
 
@@ -124,6 +143,19 @@ USE_L10N = True
 USE_TZ = True
 
 
+try:
+    from django.contrib.messages import constants as messages
+    MESSAGE_TAGS = {
+        messages.DEBUG: 'alert-info',
+        messages.INFO: 'alert-info',
+        messages.SUCCESS: 'alert-success',
+        messages.WARNING: 'alert-warning',
+        messages.ERROR: 'alert-danger',
+    }
+except Exception as e:
+    pass
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
@@ -138,3 +170,23 @@ STATICFILES_DIRS = [
 # Path for media files (That is to be uploaded by user)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')
+
+
+#AUTH_USER_MODEL = 'profiles.User'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'profiles.authentication.EmailAuthBackend',
+)
+
+# Used to redirect user to login url if not authenticated
+LOGIN_URL = 'login.show'
+# Used after successful login
+LOGIN_REDIRECT_URL = 'profile.dashboard'
+
+
+
+
+STRIPE_PUBLIC_KEY = "pk_test_TvIjw35XZPEI9l6nCzurkjgL00w0EDWvhF"
+STRIPE_SECRET_KEY = "sk_test_mlWE6vvLPgDPZexbqPHWuhgz0007W6lAz3"
+STRIPE_WEBHOOK_SECRET = "whsec_i0CVpuOJg1YGAbPMDa1qJkcK6MuBR8qI"

@@ -1,0 +1,347 @@
+{% extends 'front/base.html' %}
+{% load static %}
+
+{% block css_block %}
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/w3.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'front/css/profile-sidebar.css' %}">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<style type="text/css">
+	body{
+	    background:#eee;
+	}
+
+
+	.form-control:focus {
+	    box-shadow: none;
+	    border-color: #BA68C8
+	}
+
+	.profile-button {
+	    background: rgb(255 165 0) !important;
+	    box-shadow: none;
+	    border: none
+	}
+
+	.profile-button:hover {
+	    background: #682773
+	}
+
+	.profile-button:focus {
+	    background: #682773;
+	    box-shadow: none
+	}
+
+	.profile-button:active {
+	    background: #682773;
+	    box-shadow: none
+	}
+
+	.back:hover {
+	    /*color: #682773;*/
+	    cursor: pointer
+	}
+
+	.labels {
+	    font-size: 11px
+	}
+
+	.add-experience:hover {
+	    background: #BA68C8;
+	    color: #fff;
+	    cursor: pointer;
+	    border: solid 1px #BA68C8
+	}
+
+	/*  For javascript validation error  */
+	.error{
+		color: red;
+		padding-left: 0px;
+		font-size: 13px;
+	}
+
+
+</style>
+{% endblock css_block %}
+
+{% block content %}
+	
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<!-- Profile Navbar  -->
+				{% include 'front/partials/profile_navbar.html' %}
+			</div>
+		    <div class="col-md-9">
+		    	<br>
+		    	<p class="profile_header">My Profile</p>
+
+		    	<div class="row message_div">
+		    		<div class="col-md-12">
+		    			{% for message in messages %}
+		    				<div class="alert {{ message.tags }} alert-dismissible alert-class" style="width: 100%;" role="alert">
+		    				     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		    				         <span aria-hidden="true">&times;</span>
+		    				     </button>
+		    				     {{ message | safe }}
+		    				</div>
+		    			{% endfor %}
+		    		</div>
+		    	</div>
+
+		    	<ul class="nav nav-tabs">
+		    	  <li class="{% if tab_id == 1 %}active{% endif %}"><a href="{% url 'profile.dashboard' 1 %}">Profile</a></li>
+		    	  <li class="{% if tab_id == 2 %}active{% endif %}"><a href="{% url 'profile.dashboard' 2 %}">Address</a></li>
+		    	  <li><a href="#">Menu 2</a></li>
+		    	  <li><a href="#">Menu 3</a></li>
+		    	</ul>
+
+		    	<!--  Tab 1 : Profile Settings -->
+		    	<div class="rounded bg-white mb-5 {% if tab_id == 1 %}profile_tab_show{% else %}profile_tab_hide{% endif %}">
+		    		<form action="{% url 'profile.update' %}" method="post" id="profile_form" class="profile_form">
+		    		{% csrf_token %}
+		    	    <div class="row profile_tab_show">
+		    	        <div class="col-md-3 border-right">
+		    	            <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"><span class="font-weight-bold">{{ user_data.first_name }} {{ user_data.last_name }}</span><span class="text-black-50">{{ user_data.email }}</span><span> </span></div>
+		    	        </div>
+		    	        <div class="col-md-9">
+		    	            <div class="p-3 py-5">
+		    	                <div class="d-flex justify-content-between align-items-center mb-3">
+		    	                    <h4 class="text-right">Manage Profile</h4>
+		    	                </div>
+		    	                <div class="row mt-2">
+		    	                    <div class="col-md-6">
+		    	                    	<label class="labels">First Name</label>
+		    	                    	<input type="text" name="first_name" class="form-control" placeholder="First Name" value="{{ user_data.first_name }}">
+		    	                    </div>
+		    	                    <div class="col-md-6">
+		    	                    	<label class="labels">Last Name</label>
+		    	                    	<input type="text" name="last_name" class="form-control" placeholder="Last Name" value="{{ user_data.last_name }}">
+		    	                    </div>
+		    	                </div>
+
+		    	                <div class="row mt-3">
+
+		    	                    <div class="col-md-6">
+		    	                    	<div class="col-md-6"><label class="labels">
+		    	                    		Username
+		    	                    		
+		    	                    	</label></div>
+		    	                    	<div class="col-md-6 username_notification"></div>
+		    	                    	<input type="text" name="username" id="username" class="form-control" placeholder="Username" value="{{ user_data.username }}">
+		    	                    </div>
+
+		    	                    <div class="col-md-6">
+		    	                    	<label class="labels">Mobile Number</label>
+		    	                    	<input type="text" name="phone" class="form-control" placeholder="Enter phone number" value="{{ user_data.profile.phone }}">
+		    	                    </div>
+
+		    	                    <div class="col-md-12">
+		    	                    	<label class="labels">Email ID</label>
+		    	                    	<input type="text" name="email" class="form-control" placeholder="Enter email" value="{{ user_data.email }}">
+		    	                    </div>
+
+		    	                    <!--  <div class="col-md-12">
+		    	                    	<label class="labels">Address Line 1</label>
+		    	                    	<input type="text" class="form-control" placeholder="enter address line 1" value="">
+		    	                    </div>
+		    	                    <div class="col-md-12"><label class="labels">Address Line 2</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Postcode</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">State</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Area</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Education</label><input type="text" class="form-control" placeholder="education" value=""></div> -->
+		    	                </div>
+		    	                <div class="row mt-3">
+
+		    	                    <div class="col-md-6">
+		    	                    	<label class="labels">Date of Birth</label>
+		    	                    	<input type="text" name="date_of_birth" readonly class="form-control" id="datepicker" placeholder="Date of Birth" value="{{ user_data.profile.birth_date|date:'Y/m/d' }}">
+		    	                    </div>
+
+		    	                    <div class="col-md-6">
+		    	                    	<label class="labels">Gender</label>
+		    	                    	<br>
+		    	                    	<label><input type="radio" id="html" name="gender" value="1" {% if user_data.profile.gender == 1 %}checked{% endif %} > Male </label>
+		    	                    	<label><input type="radio" id="html" name="gender" value="0" {% if user_data.profile.gender == 0 %}checked{% endif %} > Female </label>
+		    	                    </div>
+
+		    	                </div>
+		    	                <div class="mt-5 text-right">
+		    	                	<button class="btn btn-primary profile-button" type="submit">Save Profile</button>
+		    	                </div>
+		    	            </div>
+		    	        </div>
+		    	        <!-- <div class="col-md-3">
+		    	            <div class="p-3 py-5">
+		    	                <div class="d-flex justify-content-between align-items-center experience"><span>Edit Experience</span><span class="border px-3 p-1 add-experience"><i class="fa fa-plus"></i>&nbsp;Experience</span></div><br>
+		    	                <div class="col-md-12"><label class="labels">Experience in Designing</label><input type="text" class="form-control" placeholder="experience" value=""></div> <br>
+		    	                <div class="col-md-12"><label class="labels">Additional Details</label><input type="text" class="form-control" placeholder="additional details" value=""></div>
+		    	            </div>
+		    	        </div> -->
+		    	    </div>
+		    		</form>
+		    	</div>
+
+
+		    	<!--  Tab 2 : Address Settings -->
+		    	<div class="rounded bg-white mb-5 {% if tab_id == 2 %}profile_tab_show{% else %}profile_tab_hide{% endif %}">
+		    	    <div class="row profile_tab_show">
+		    	        <div class="col-md-3 border-right">
+		    	            <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"><span class="font-weight-bold">Edogaru</span><span class="text-black-50">edogaru@mail.com.my</span><span> </span></div>
+		    	        </div>
+		    	        <div class="col-md-9">
+		    	            <div class="p-3 py-5">
+		    	                <div class="d-flex justify-content-between align-items-center mb-3">
+		    	                    <h4 class="text-right">Manage Address</h4>
+		    	                </div>
+		    	                <div class="row mt-2">
+		    	                    <div class="col-md-6"><label class="labels">Name</label><input type="text" class="form-control" placeholder="first name" value=""></div>
+		    	                    <div class="col-md-6"><label class="labels">Surname</label><input type="text" class="form-control" value="" placeholder="surname"></div>
+		    	                </div>
+		    	                <div class="row mt-3">
+		    	                    <div class="col-md-12"><label class="labels">Mobile Number</label><input type="text" class="form-control" placeholder="enter phone number" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Address Line 1</label><input type="text" class="form-control" placeholder="enter address line 1" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Address Line 2</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Postcode</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">State</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Area</label><input type="text" class="form-control" placeholder="enter address line 2" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Email ID</label><input type="text" class="form-control" placeholder="enter email id" value=""></div>
+		    	                    <div class="col-md-12"><label class="labels">Education</label><input type="text" class="form-control" placeholder="education" value=""></div>
+		    	                </div>
+		    	                <div class="row mt-3">
+		    	                    <div class="col-md-6"><label class="labels">Country</label><input type="text" class="form-control" placeholder="country" value=""></div>
+		    	                    <div class="col-md-6"><label class="labels">State/Region</label><input type="text" class="form-control" value="" placeholder="state"></div>
+		    	                </div>
+		    	                <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="button">Save Profile</button></div>
+		    	            </div>
+		    	        </div>
+		    	        <!-- <div class="col-md-3">
+		    	            <div class="p-3 py-5">
+		    	                <div class="d-flex justify-content-between align-items-center experience"><span>Edit Experience</span><span class="border px-3 p-1 add-experience"><i class="fa fa-plus"></i>&nbsp;Experience</span></div><br>
+		    	                <div class="col-md-12"><label class="labels">Experience in Designing</label><input type="text" class="form-control" placeholder="experience" value=""></div> <br>
+		    	                <div class="col-md-12"><label class="labels">Additional Details</label><input type="text" class="form-control" placeholder="additional details" value=""></div>
+		    	            </div>
+		    	        </div> -->
+		    	    </div>
+		    	</div>
+ 
+
+
+
+
+		    </div>
+		</div>
+	</div>
+		
+
+
+{% endblock content %}
+
+
+{% block js_block %}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
+	$(function(){
+
+		// CHECKING THE EXISTANCE OF USERNAME IN DB
+		$("#username").on('keyup', function(){
+			var username = $(this).val();
+			
+			if(username != ''){
+				$.ajax({
+					url: '{% url "username.check" %}',
+					method: "post",
+					data: {'username': username, csrfmiddlewaretoken: "{{ csrf_token }}"},
+					success: function(data){
+						if(data[0].users_count > 0){
+							$('.username_notification').text('username taken').css({'color': 'red'});
+						}else{
+							$('.username_notification').text('username exists').css({'color': 'green'});
+						}
+					},
+					error: function(data){
+
+					},
+					complete: function(data){
+
+					}
+				});
+			}else{
+				$('.username_notification').text('');
+			}
+				
+		});
+
+		setTimeout(function(){
+			$('.message_div').slideUp("slow");
+		},5000)
+
+		$('#datepicker').datepicker({
+			changeMonth: true,
+        	changeYear: true,
+        	dateFormat: "yy/mm/dd"
+		});
+
+		$("#profile_form").validate({
+
+			// Specify the rules
+			rules:{
+				first_name: "required",
+				last_name:  "required",
+				username:{
+					required: true,
+					minlength: 8
+				},
+				phone:{
+					required: true,
+					minlength: 10,
+					maxlength: 10,
+					number: true
+				},
+				email:{
+					required: true,
+					email: true
+				},
+				date_of_birth:{
+					required: true
+				},
+				gender:{
+					required: true
+				}
+			},
+			// Specify the messages
+			messages:{
+
+				first_name: "First name required",
+				last_name:  "Last name required",
+				username:{
+					required: "Username required",
+					minlength: "Minimum 8 character required"
+				},
+				phone:{
+					required: "Phone required",
+					minlength: "Minimum 10 digits required",
+					maxlength: "Minimum 10 digits required",
+					number: "Enter only numeric value"
+				},
+				email:{
+					required: "Email is required",
+					email: "Enter valid email"
+				},
+				date_of_birth:{
+					required: "Date of birth required"
+				},
+				gender:{
+					required: "Please select gender"
+				}
+
+			},
+			submitHandler: function(form){
+				form.submit();
+			}
+		});
+
+
+	});
+</script>
+{% endblock js_block %}
