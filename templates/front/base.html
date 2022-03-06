@@ -19,6 +19,27 @@
 		{# block for individual page js #}
 		{% block js_block %}
 		{% endblock %}
+
+		<script type="text/javascript">
+
+			function update_cart_logo_count(){
+				$.ajax({
+					url: '{% url "update_cart_logo_count" %}',
+					method: "post",
+					data: {'username': 'abc', csrfmiddlewaretoken: "{{ csrf_token }}"},
+					success: function(data){
+						$('#lblCartCount').text(data[0].cart_count);
+					},
+					error: function(data){
+
+					},
+					complete: function(data){
+
+					}
+				});	
+			}
+
+		</script>
 		
 	</body>
 </html>

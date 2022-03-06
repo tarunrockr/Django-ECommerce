@@ -44,3 +44,11 @@
   border-radius: 4px;
   font-weight: 700!important;
 }
+
+.profile_tab_hide{
+  display: none;
+}
+
+.profile_tab_show{
+  display: block;
+}

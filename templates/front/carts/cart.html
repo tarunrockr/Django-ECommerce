@@ -383,7 +383,7 @@
 	                	{# {{ cart }} #}
 	                	{% if success == False %}
 	                    <!-- Alert-->
-	                     <div class="alert alert-info alert-dismissible fade show text-center" style="margin-bottom: 30px;"><span class="alert-close" data-dismiss="alert"></span>&nbsp;&nbsp;Your Cart is empty. <strong>Continue Shopping</strong></div> 
+	                     <div class="alert alert-info alert-dismissible fade show text-center" style="margin-bottom: 30px;"><span class="alert-close" data-dismiss="alert"></span>&nbsp;&nbsp;Your Cart is empty. <strong><a href="{% url 'products' %}">Continue Shopping</a></strong></div> 
 	                    {% else %}
 
 		                    {% if cart|length > 0 %}
@@ -698,12 +698,12 @@
 	                <!-- bootdey.com -->
 
 	                <div class="ibox-content">
-	                    <button class="btn btn-primary pull-right"><i class="fa fa fa-shopping-cart"></i><a href="{% url 'checkout' %}">Checkout</a> </button>
+	                	{% if cart|length > 0 %}
+	                    	<a href="{% url 'checkout' %}" class="checkout_btn"><button class="btn btn-primary pull-right"><i class="fa fa fa-shopping-cart "></i> Checkout </button></a>
+	                    {% endif %}
 	                    <a href="{% url 'products' %}"><button class="btn btn-white"><i class="fa fa-arrow-left"></i> Continue shopping</button></a>
 	                </div>
 	            </div>
-
-
 
 	        </div>
 	        <div class="col-md-3">
@@ -725,7 +725,9 @@
 	                    </span>
 	                    <div class="m-t-sm">
 	                        <div class="btn-group">
-	                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-sm"><i class="fa fa-shopping-cart"></i> Checkout</a>
+	                        {% if cart|length > 0 %}
+	                        	<a href="{% url 'checkout' %}" class="btn btn-primary btn-sm checkout_btn"><i class="fa fa-shopping-cart"></i> Checkout</a>
+	                        {% endif %}
 	                        <a href="#" class="btn btn-white btn-sm"> Cancel</a>
 	                        </div>
 	                    </div>
@@ -784,6 +786,20 @@
 {% block js_block %}
 <script type="text/javascript">
 	$(function(){
+
+		$(document).on('click','.checkout_btn',function(event){
+			event.preventDefault();
+
+			// Checking if user logged in or not 
+			$.ajax({
+				url: '{% url "checkout.login_check" %}',
+				method: "GET",
+				dataType: "JSON",
+				success: function(data){
+					console.log("Login check: "+JSON.stringify(data));
+				}
+			});
+		});
 
 		$(document).on('click', '.quantity_inc', function(event){
 			event.preventDefault();
@@ -844,11 +860,11 @@
 
 				},
 				complete: function(data){
-
+					update_cart_logo_count();
 				}
 			});
 
-
+			
 		});
 
 		$(document).on('click', '.quantity_desc', function(event){
@@ -910,7 +926,7 @@
 
 				},
 				complete: function(data){
-
+					update_cart_logo_count();
 				}
 			}); 
 
@@ -975,7 +991,7 @@
 
 				},
 				complete: function(data){
-
+					update_cart_logo_count();
 				}
 			});
 		});

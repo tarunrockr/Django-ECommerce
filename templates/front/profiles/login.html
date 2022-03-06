@@ -22,14 +22,16 @@
 				  <div class="container">
 
 				  	<div class="row">
+				  		<div class="col-md-12">
 				  	    {% for message in messages %}
-				  	         <div class="alert {{ message.tags }} alert-dismissible alert-class " role="alert">
+				  	        <div class="alert {{ message.tags }} alert-dismissible alert-class" style="width: 100%;" role="alert">
 				  	             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
 				  	                 <span aria-hidden="true">&times;</span>
 				  	             </button>
 				  	             {{ message | safe }}
-				  	         </div>
-				  	     {% endfor %}
+				  	        </div>
+				  	    {% endfor %}
+				  	 	</div>
 				  	</div>
 
 				  	<div class="header_cls">

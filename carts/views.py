@@ -522,12 +522,19 @@ def remove_cart_quantity(request):
 				data=[{'success': False, 'error': True, 'message': 'Product not found'}]
 				return JsonResponse(data, safe=False)
 			
-
 		else:
 			data=[{'success': False, 'error': True, 'message': 'Cart is empty'}]
 			return JsonResponse(data, safe=False)
 
+def checkout_login_check(request):
+	
 
+	if request.user.is_authenticated:
+		data = [{'login': True}]
+		return JsonResponse(data, safe=False)
+	else:
+		data = [{'login': False}]
+		return JsonResponse(data, safe=False)
 
 # Checkout page functions 
 
@@ -775,4 +782,53 @@ def fetch_shipping_address_ajax(request):
 	else:
 		data = [{'success': True, 'message': 'Please login to continue', 'login': False}]
 		return JsonResponse(data, safe=False)
+
+
+def update_cart_logo_count(request):
+
+	if request.user.is_authenticated:
+
+		user_id = request.session['user_id']
+		cart_count = 0
+		try:
+			cart_data     = Cart.objects.get(user_id = user_id)
+		except Cart.DoesNotExist:
+			cart_data = None
+		if cart_data is not None:
+			try:
+				cartitem_data = CartItem.objects.filter(cart_id = cart_data.id)
+			except CartItem.DoesNotExist:
+				cartitem_data = None
+
+			if cartitem_data is not None:
+				for ele in cartitem_data:
+					cart_count +=  ele.quantity
+
+		data = [{'cart_count': cart_count}]
+		return JsonResponse(data, safe=False)
+
+	else:
+		# Getting the cart item count from cookies
+		if 'cart' in request.COOKIES.keys():
+
+			# Get cart from cookies
+			data = request.COOKIES['cart']
+
+			# using ast.literal_eval() convert dictionary string to dictionary
+			data = ast.literal_eval(data)
+
+			total_item = 0
+
+			for key, value in data.items():
+				total_item += value['product_quantity']
+
+			data = [{'cart_count': cart_count}]
+			return JsonResponse(data, safe=False)
+
+		else:
+
+			data = [{'cart_count': cart_count}]
+			return JsonResponse(data, safe=False)
+
+	
 

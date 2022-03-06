@@ -1,5 +1,6 @@
 from django.db import models
 from .managers import CustomManager
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -50,7 +51,7 @@ from .managers import CustomManager
 
 
 
-# Example of custom manager
+# Test Example of custom manager
 class TestStudent(models.Model):
 	name = models.CharField(max_length=200)
 	roll = models.IntegerField()
@@ -62,7 +63,36 @@ class TestStudent(models.Model):
 	# students= models.Manager()
 
 	# Using custom manager from managers file
-	students  = CustomManager()
+	students = CustomManager()
+
+
+# Test for query lookups in ORM like lt,gt,exact,contains
+
+class Dummy(models.Model):
+	name = models.CharField(max_length=200)
+	roll = models.IntegerField(unique = True, null=False)
+	city = models.CharField(max_length=200)
+	marks= models.IntegerField()
+	passdate = models.DateField()
+	ndatetime = models.DateTimeField()
+
+
+
+# Test model for One To One Relationship
+# class Page(models.Model):
+
+# 	user = models.OneToOneField(User,on_delete=models.CASCADE)
+# 	page_name = models.CharField(max_length=200)
+# 	page_category = models.CharField(max_length=200)
+# 	publish_date = models.DateTimeField()
+
+
+# Test model for Many To Many Relationship
+class TestSong(models.Model):
+
+	user      = models.ManyToManyField(User)
+	song_name = models.CharField(max_length=200)
+	song_date = models.DateTimeField()
 
 
 
