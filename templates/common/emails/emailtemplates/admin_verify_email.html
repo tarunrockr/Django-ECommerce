@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Email verification</title>
+</head>
+<body>
+	<p> Hi {{ user.first_name }} {{ user.last_name }}</p>
+
+	{% if raw_password %}
+		<p> Your password: {{ raw_password }}</p>
+	{% endif %}
+
+	<p> Click to verify email: <a href="{{ custom_url }}">Verify Your Email</a></p>
+
+	<p>Thank You</p>
+</body>
+</html>

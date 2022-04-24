@@ -1,12 +1,18 @@
 from django.db import models
 from .managers import CustomManager
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 # Create your models here.
 
+class Groupinfo(models.Model):
+	group         = models.OneToOneField(Group, on_delete=models.CASCADE)
+	description   = models.TextField(null=True, blank=True)
+	dashboard_url = models.CharField(null=True, blank=True, max_length=255) 
+	login_url     = models.CharField(null=True, blank=True, max_length=255) 
 
 
 
+# Just for testing purpose. Not related to project
 # # ------------------- Example of Model inheritance ( Using Abstract Parent(Base) class) --------------
 
 # # Abstract Class(This class will not create any database table )

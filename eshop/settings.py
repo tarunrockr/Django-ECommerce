@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'carts.apps.CartsConfig',
     'orders.apps.OrdersConfig',
 
+    # Common Apps
+    'emails.apps.EmailsConfig',
+
     # Custom Admin apps
     'admin_login.apps.AdminLoginConfig',
     'admin_profile.apps.AdminProfileConfig',
@@ -190,3 +193,11 @@ LOGIN_REDIRECT_URL = 'profile.dashboard'
 STRIPE_PUBLIC_KEY = "pk_test_TvIjw35XZPEI9l6nCzurkjgL00w0EDWvhF"
 STRIPE_SECRET_KEY = "sk_test_mlWE6vvLPgDPZexbqPHWuhgz0007W6lAz3"
 STRIPE_WEBHOOK_SECRET = "whsec_i0CVpuOJg1YGAbPMDa1qJkcK6MuBR8qI"
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST    = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'mk49369@gmail.com'
+EMAIL_HOST_PASSWORD = 'eitngszvximswicz'
+EMAIL_PORT = 587

@@ -25,10 +25,16 @@ class EmailAuthBackend(ModelBackend):
                 cursor.execute(sql)
                 current_user_group = cursor.fetchone()
                 current_user_group_id = current_user_group[2]
+
+                print(current_user_group_id)
+
+                # Allowed groups to login from backend(admin, superadmin)
+                allowed_admin_group_ids = [1,4]
                 
                 if current_user_group_id in group_list:
-                    if user.check_password(password):
-                        return user
+                    if current_user_group_id in allowed_admin_group_ids:
+                        if user.check_password(password):
+                            return user
 
                 return None
                 

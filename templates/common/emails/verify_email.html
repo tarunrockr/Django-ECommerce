@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Verify Email</title>
+	
+	<!--   CSS Files  -->
+	<link rel="stylesheet" type="text/css" href="{% static 'front/css/bootstrap.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{% static 'front/css/product.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'front/css/main.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'front/css/jquery-confirm.min.css' %}">
+
+
+	<!--   JS Files  -->
+	<script type="text/javascript" src="{% static 'front/js/jquery.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'front/js/jquery.validate.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'front/js/bootstrap.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'front/js/popper.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'front/js/jquery-confirm.min.js' %}"></script>
+</head>
+<body>
+	
+
+		<br>
+		<br>
+		<div class="row">
+			<div class="container">
+				<div class="col-md-6 offset-md-3">
+
+					<h2>Email verification</h2>
+
+					<div class="row alert_div" style="display:none;">
+					  <div class="col-md-12">
+				        <div class="alert alert-success alert-dismissible alert-class" style="width: 100%;" role="alert">
+				             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				                 <span aria-hidden="true">&times;</span>
+				             </button>
+				             <span class="alert_message"></span>
+				        </div>
+					  </div>
+					</div>
+
+					<div>
+						<h4 style="background-color:grey; padding:5px; padding-left:20px; border-radius:5px; color:#fff;">
+							Resend email verification mail: 
+							<a href="#" class="btn btn-primary resend_mail" >Send <i class="fa fa-arrow-right"></i></a>
+							<input type="hidden" name="user_id" id="user_id" value="{{ user_id }}">
+						</h4>
+					</div>
+
+					  <table class="table table-bordered">
+					    <thead>
+					      <tr>
+					        <td colspan="2" align="center">User Information</th>
+					      </tr>
+					    </thead>
+					    <tbody>
+					      <tr>
+					        <td>Name</td>
+					        <td>Doe</td>
+					      </tr>
+					      <tr>
+					        <td>Email</td>
+					        <td>Moe</td>
+					      </tr>
+					      <tr>
+					        <td>Role</td>
+					        <td>Dooley</td>
+					      </tr>
+					      <tr>
+					        <td>Email Status</td>
+					        <td>Dooley</td>
+					      </tr>
+					    </tbody>
+					  </table>
+
+					</div>
+				</div>
+				
+			</div>
+			
+		</div>
+</body>
+<script type="text/javascript">
+	$(function(){
+
+		$(document).on('click', ".resend_mail", function(event){
+			event.preventDefault();
+			
+			var user_id = $("#user_id").val();
+			//alert("user id "+user_id)
+
+			$.ajax({
+				url: "{% url 'email.verify.resend' %}",
+				method: "POST",
+				data: {user_id: user_id, csrfmiddlewaretoken: "{{ csrf_token }}" },
+				//dataType: "json",
+				beforeSend: function(){
+					// Replacing the anchor that having 'resend_email' class
+					$("a.resend_mail").replaceWith("<div class='spinner-border text-primary spinner_class' role='status'><span class='sr-only'>Loading...</span></div>");
+				},
+				success: function(data){
+					//data = JSON.stringify(data);
+					//alert("Returned data: "+data.user_id);
+					$(".alert_message").text("Mail send successfully. Check your inbox.");
+					$(".alert_div").show();
+
+				},
+				error: function(){
+
+				},
+				complete: function(){	
+					$(".spinner_class").replaceWith("<a href='#' class='btn btn-primary resend_mail' >Send <i class='fa fa-arrow-right'></i></a>");
+					setTimeout(function(){
+						$(".alert_message").text("");
+						$(".alert_div").hide(1500);
+					},3000);
+				}
+
+
+			});
+
+		});
+
+	});
+</script>
+</html>

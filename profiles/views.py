@@ -15,25 +15,34 @@ from django.db.models import Q
 import ast
 import decimal
 import sys
+from . import common
+from django.db import connection
 
-# Create your views here.
+
+
+# Common class object
+common_obj = common.Common(connection)
 
 # def user_not_loggedin(user):
 # 	# Return true is user is logged out
 # 	return not user.is_authenticated
 
-#@user_passes_test(user_not_loggedin, login_url='/user_profile')
+
 def register_show(request):
 	if request.user.is_authenticated:
-		return HttpResponseRedirect(reverse('profile.dashboard', kwargs={'tab_id': 1}))
+		#return HttpResponseRedirect(reverse('profile.dashboard', kwargs={'tab_id': 1}))
+		dashboard_url = common_obj.redirect_to_dashboard(request)
+		return HttpResponseRedirect(dashboard_url)
 
 	return render(request, 'front/profiles/register.html', {})
 
-#@user_passes_test(user_not_loggedin, login_url='/user_profile')
+
 def register_post(request):
 
 	if request.user.is_authenticated:
-		return HttpResponseRedirect(reverse('profile.dashboard', kwargs={'tab_id': 1}))
+		#return HttpResponseRedirect(reverse('profile.dashboard', kwargs={'tab_id': 1}))
+		dashboard_url = common_obj.redirect_to_dashboard(request)
+		return HttpResponseRedirect(dashboard_url)
 	
 	if request.method == "POST":
 
@@ -85,23 +94,27 @@ def register_post(request):
 			messages.error(request, "User already Registerd.")
 			return HttpResponseRedirect(reverse('register.show'))
 
-#@user_passes_test(user_not_loggedin, login_url='/user_profile')
+
 def login_show(request):
 
 	# new_hash_password = make_password('123456')
 	# return HttpResponse(new_hash_password)
 
 	if request.user.is_authenticated:
-		return HttpResponseRedirect(reverse('profile.dashboard', kwargs={'tab_id': 1}))
+		#return HttpResponseRedirect(reverse('profile.dashboard', kwargs={'tab_id': 1}))
+		dashboard_url = common_obj.redirect_to_dashboard(request)
+		return HttpResponseRedirect(dashboard_url)
 
 	form = LoginForm()
 	return render(request, 'front/profiles/login.html', {'form': form})
 
-#@user_passes_test(user_not_loggedin, login_url='/user_profile')
+
 def login_post(request):
 
 	if request.user.is_authenticated:
-		return HttpResponseRedirect(reverse('profile.dashboard', kwargs={'tab_id': 1}))
+		#return HttpResponseRedirect(reverse('profile.dashboard', kwargs={'tab_id': 1}))
+		dashboard_url = common_obj.redirect_to_dashboard(request)
+		return HttpResponseRedirect(dashboard_url)
 	
 	if request.method == "POST":
 
@@ -174,14 +187,17 @@ def login_post(request):
 		form = LoginForm()
 		return render(request, 'front/profiles/login.html', {'form': form})
 
-def logout(request):
 
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
+def logout(request):
 	auth.logout(request)
 	messages.success(request,"Success: Logout successfully.")
 	return HttpResponseRedirect(reverse('login.show'))
 
-#@login_required(login_url = 'login.show')
-@login_required()
+
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
 def  user_profile(request,tab_id):
 	#return HttpResponse(request.session['email'])
 	
@@ -197,7 +213,8 @@ def  user_profile(request,tab_id):
 
 	return render(request, 'front/profiles/profile_dashboard.html', context)
 
-@login_required
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
 def user_profile_update(request):
 
 	if request.method == "POST":
@@ -227,13 +244,16 @@ def user_profile_update(request):
 		return HttpResponseRedirect(reverse('profile.dashboard', kwargs = {'tab_id': 1}))
 
 	return HttpResponse('profile update function')
-	
-@login_required()
-def change_password(request):
 
+	
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
+def change_password(request):
 	return render(request, 'front/profiles/change_password.html', {})
 
-@login_required
+
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
 def change_password_post(request):
 
 	if request.method == "POST":
@@ -267,7 +287,8 @@ def change_password_post(request):
 
 
 # Function to check the existance of username
-@login_required
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
 def check_username(request):
 
 	username = request.POST['username']

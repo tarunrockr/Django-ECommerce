@@ -6,6 +6,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Front User urls
     path('', include('store.urls')),
     path('', include('profiles.urls')),
     path('', include('carts.urls')),
@@ -13,7 +15,11 @@ urlpatterns = [
 
     # Admin urls
     path('backend/', include('admin_login.urls')),
-    path('backend/', include('admin_profile.urls'))
+    path('backend/', include('admin_profile.urls')),
+    path('backend/', include('admin_manage_users.urls')),
+
+    # Common urls
+    path('', include('emails.urls'))
 ]
 
 if settings.DEBUG:

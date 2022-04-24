@@ -9,6 +9,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
 import json
 import ast
+from django.contrib.auth.decorators import login_required, user_passes_test
+from profiles import common
+from django.db import connection
+
+
+
+# Common class object
+common_obj = common.Common(connection)
+
 
 import stripe
 from django.conf import settings 
@@ -539,6 +548,8 @@ def checkout_login_check(request):
 # Checkout page functions 
 
 # Show checkout page
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
 def checkout(request):
 
 	if request.user.is_authenticated:

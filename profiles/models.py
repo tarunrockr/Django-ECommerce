@@ -18,6 +18,8 @@ class Profile(models.Model):
 	country     = models.CharField(max_length=50,null=True)
 	postal_code = models.IntegerField(null=True)
 	gender      = models.IntegerField(null=True)
+	hashstr     = models.TextField(null=True)
+	email_verify= models.IntegerField(default='0')
 	created_at  = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated_at  = models.DateTimeField(auto_now_add=False, auto_now=True)
 	status      = models.IntegerField(default=1)

@@ -4,6 +4,8 @@
 <head>
   <!-- /.header script -->
   {% include 'admin/partials/header_script.html' %}
+  {% block css_block %}
+  {% endblock %}
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -39,5 +41,20 @@
 <!-- jQuery -->
 <!-- /.footer script -->
 {% include 'admin/partials/footer_script.html' %}
+
+{# block for individual page js #}
+{% block js_block %}
+{% endblock %}
+
+<script type="text/javascript">
+
+  $(function(){
+    setTimeout(function(){
+      $('.message_div').slideUp("slow");
+    },5000);
+  });
+    
+</script>
+
 </body>
 </html>

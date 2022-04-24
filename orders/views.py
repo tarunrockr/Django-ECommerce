@@ -4,7 +4,18 @@ from   django.http import HttpResponse, JsonResponse
 from   django.utils import formats
 import json
 import pprint
+from django.contrib.auth.decorators import login_required, user_passes_test
+from profiles import common
+from django.db import connection
 
+
+
+# Common class object
+common_obj = common.Common(connection)
+
+
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
 def order_list(request):
 	return render(request, 'front/orders/orders.html', {})
 
@@ -37,6 +48,9 @@ DEFAULT_SORTING_METHOD = 'asc'
 #     return int(request_values.get('iDisplayStart', self.DEFAULT_START_POSITION)),\
 #                int(request_values.get('iDisplayLength', self.DEFAULT_PAGE_SIZE))
 
+
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
 def orders_data_ajax(request):
 
 	#pprint.pprint(request.GET)

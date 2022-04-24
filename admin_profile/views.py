@@ -2,19 +2,22 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render
 from .models import TestStudent, Dummy
+from django.contrib.auth.decorators import login_required, user_passes_test
+from . import common
+from django.db import connection
 
-# Create your views here.
+
+# Common class object
+common_obj = common.Common(connection)
 
 
+@login_required( login_url = common_obj.this_group_login_url )
+@user_passes_test( common_obj.check_user_group, login_url = common_obj.this_group_login_url )
 def dashboard(request):
-	# return HttpResponse('In admin dashboard')
-	print("In dashboard")
 	return render(request, 'admin/profiles/dashboard.html')
 
 
-
 # Test functions
-
 def test_function(request):
 	# student_data = TestStudent.objects.all()
 	student_data = TestStudent.students.get_stu_roll_range(102,105)

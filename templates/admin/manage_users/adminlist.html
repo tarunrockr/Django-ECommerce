@@ -1,0 +1,218 @@
+{% extends 'admin/master.html' %}
+
+{% block css_block %}
+<style type="text/css">
+	.error{
+		color: red;
+		padding-left: 0px;
+		font-size: 13px;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Admin Users</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active">Admin Users</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+
+
+    <div class="row message_div">
+	  	<div class="col-md-12">
+	  		{% for message in messages %}
+	  			<div class="alert {{ message.tags }} alert-dismissible alert-class " style="width:100%;" role="alert">
+	  				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+	                   <span aria-hidden="true">&times;</span>
+	               </button>
+	               {{ message | safe }}
+	  			</div>
+	  		{% endfor %}
+	  	</div>
+  	</div>
+
+      <!-- SELECT2 EXAMPLE -->
+      <div class="card card-secondary">
+        <div class="card-header">
+          <h3 class="card-title">Add <i class="fa fa-plus-circle"></i></h3>
+
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+              <i class="fa fa-minus"></i>
+            </button>
+           <!--  <button type="button" class="btn btn-tool" data-card-widget="remove">
+              <i class="fa fa-times"></i>
+            </button> -->
+          </div>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+
+        <form name="add_admin_user_form" id="add_admin_user_form" method="post" action="{% url 'admin.create' %}" >
+        	{% csrf_token %}
+          <div class="row">
+          	<div class="col-md-6">
+          		<div class="form-group">
+	                <label for="first_name">First Name</label>
+	                <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter First Name">
+	            </div>
+          	</div>
+          	<div class="col-md-6">
+          		<div class="form-group">
+	                <label for="last_name">Last Name</label>
+	                <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter Last Name">
+	            </div>
+          	</div>
+          </div>
+
+            <div class="row">
+            	<div class="col-md-6">
+            		<div class="form-group">
+  	                <label for="username">Username</label>
+  	                <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
+  	            </div>
+            	</div>
+            	<div class="col-md-6">
+            		<div class="form-group">
+  	                <label for="email">Email</label>
+  	                <input type="text" class="form-control" id="email" name="email" placeholder="Enter Email">
+  	            </div>
+            	</div>
+            </div>
+
+	        <div class="row">
+
+	          	<div class="col-md-6">
+	          	  <div class="form-group">
+	          	    <label>Group</label>
+	          	    <select class="form-control select2bs4" style="width: 100%;" name="group" >
+
+	          	      {% for group in groups %}
+		          	      <!-- <option selected="selected">Alabama</option> -->
+		          	      <option value="{{ group.id }}" selected="selected" readonly>{{ group.name }}</option>
+	          	      {% endfor %}
+
+	          	    </select>
+	          	  </div>
+	          	  
+	          	</div>
+
+	          	<div class="col-md-6">
+	          		<div class="form-group">
+		                <label for="last_name">Mobile</label>
+		                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter Mobile">
+		            </div>
+	          	</div>
+
+	        </div>
+
+	        <div class="row">
+
+	          	<div class="col-md-12">
+	          		<input type="submit" value="Submit" class="btn btn-secondary float-right">
+	          	</div>
+
+	        </div>
+
+	    </form>
+
+          
+          <!-- /.row -->
+        </div>
+        
+      </div>
+      <!-- /.card -->
+
+   
+      
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+
+{% endblock content %}
+
+
+{% block js_block %}
+<script type="text/javascript">
+	
+	$(function(){
+
+		$("#add_admin_user_form").validate({
+			rules:{
+
+				first_name:{
+					required: true
+				},
+				last_name:{
+					required: true
+				},
+				username:{
+					required: true,
+					minlength: 8
+				},
+				email: {
+					required: true,
+					email:    true
+				},
+				phone:{
+					required: true,
+					minlength: 10,
+					maxlength: 10,
+					number: true
+				}
+
+			},
+			messages:{
+
+				first_name: {
+					required: "First Name required"
+				},
+				last_name: {
+					required: "Last Name required"
+				},
+				username:{
+					required: "Username required",
+					minlength: "Minimum 8 character required"
+				},
+				email:{
+					required: "Email required",
+					email: "Invalid email"
+				},
+				phone:{
+					required: "Phone required",
+					minlength: "Minimum 10 digits required",
+					maxlength: "Minimum 10 digits required",
+					number: "Enter only numeric value"
+				}
+			},
+			submitHandler: function(form){
+				form.submit();
+			}
+		});
+
+	});
+
+</script>
+{% endblock %}

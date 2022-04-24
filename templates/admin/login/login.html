@@ -23,6 +23,20 @@
       <a href="../../index2.html" class="h1">{{ heading_name }}</a>
     </div>
     <div class="card-body">
+
+      <div class="row message_div">
+        <div class="col-md-12">
+          {% for message in messages %}
+              <div class="alert {{ message.tags }} alert-dismissible alert-class" style="width: 100%;" role="alert">
+                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                       <span aria-hidden="true">&times;</span>
+                   </button>
+                   {{ message | safe }}
+              </div>
+          {% endfor %}
+        </div>
+      </div>
+
       <p class="login-box-msg">Sign in to start your session</p>
 
       <form action="{% url 'admin.login.post' %}" method="post">
@@ -89,5 +103,14 @@
 <script src="{% static 'admin/js/bootstrap.bundle.min.js' %}"></script>
 <!-- AdminLTE App -->
 <script src="{% static 'admin/js/adminlte.js' %}"></script>
+
+<script type="text/javascript">
+  $(function(){
+    setTimeout(function(){
+      $('.message_div').slideUp("slow");
+    },5000);
+  });
+</script>
+
 </body>
 </html>
